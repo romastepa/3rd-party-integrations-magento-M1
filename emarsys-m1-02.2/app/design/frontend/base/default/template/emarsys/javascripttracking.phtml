@@ -1,0 +1,40 @@
+<?php $customerBy = Mage::getStoreConfig('webextendsection/webextendoptions/identityregistered'); ?>
+<?php if ($customerBy == "customer_id" && $customerId = $this->getCustomerId()): ?>
+    <script>ScarabQueue.push(["setCustomerId", "<?php echo $customerId; ?>"]);</script>
+<?php else: ?>
+    <?php if ($customerEmail = $this->getCustomerEmailAddress()): ?>
+        <script>ScarabQueue.push(["setEmail", "<?php echo $customerEmail; ?>"]);</script>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php if ($cartData = $this->getCartItemsJsonData()): ?>
+    <script>ScarabQueue.push(["cart", [<?php echo $cartData; ?>]]);</script>
+<?php endif; ?>
+
+<?php if ($extraData = $this->getAdditionalWebExtendCommands()): ?>
+    <?php echo $extraData; ?>
+<?php endif; ?>
+
+<?php
+$triggerGoCommand = true;
+if ($orders = $this->getOrderData()) {
+    foreach ($orders as $orderincrementId => $orderData) {
+        if (is_array($orderData)) {
+            $orderPageData = implode($orderData, ',');
+            if (isset($orderPageData)) {
+                echo '<script>ScarabQueue.push(["purchase", {
+                            orderId : "' . $orderincrementId . '",
+                            items : [' . $orderPageData . ']
+                        }]);</script>';
+                echo "<script>ScarabQueue.push(['go']);</script>";
+                $triggerGoCommand = false;
+            }
+        }
+    }
+}
+?>
+
+<?php if ($triggerGoCommand): ?>
+    <script>ScarabQueue.push(['go']);</script>
+<?php endif; ?>
+

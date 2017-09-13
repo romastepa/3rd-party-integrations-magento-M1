@@ -1,0 +1,111 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     default_default
+ * @copyright   Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+$storeId = $this->getRequest()->getParam("store");
+$array = Mage::helper('webextend')->getStaticFieldArray();
+
+$url = Mage::helper("adminhtml")->getUrl('*/webextend_newattribute/update');
+$deleteurl = Mage::helper("adminhtml")->getUrl('*/webextend_newattribute/delete');
+$attributeMappingUrl = Mage::helper("adminhtml")->getUrl("adminhtml/webextend_attributemapping/index/", array('store' => $storeId));
+
+$model = Mage::getModel('webextend/emarsysproductattributes');
+$collection = $model->getCollection();
+$collection->addFieldToFilter("store_id", $storeId);
+?>
+<div class="content-header">
+    <table cellspacing="0">
+        <tbody>
+            <tr>
+                <td style="width:50%;"><h3 class="icon-head head-adminhtml-attributemapping">Emarsys - Add Attribute</h3></td>
+                <td class="form-buttons"><button type="button" name="update" onclick="javascript:document.location.href='<?php echo $attributeMappingUrl;?>'">Back</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div>
+    <?php if($collection->getSize() >0) { ?>
+    <div class="emr_tbl header_label">
+        <strong>Name</strong>
+        <strong>Label</strong>
+        <?php /*<strong>Type</strong> */?>
+    </div>
+    <input type="hidden" name="form_key" value="<? echo Mage::getSingleton('core/session')->getFormKey(); ?>" />
+    <input type="hidden" name="storeId" value="<?php echo $storeId;?>">
+    <?php
+    foreach($collection as $col_record) {
+        $readonly = 0;
+        if(in_array($col_record->getAttributeCode(),$array)) { $readonly=1;}
+        ?>
+        <div class="emr_tbl emr_content">
+            <input type="text" id="attribute_code<?php echo $col_record->getId();?>" <?php if($readonly == 1){ ?> readonly <?php } ?> name="<?php echo "attribute_code".$col_record->getId();?>" value="<?php echo $col_record->getAttributeCode();?>" />
+            <input type="text" id="attribute_label<?php echo $col_record->getId();?>"  <?php if($readonly == 1){ ?> readonly <?php } ?> name="<?php echo "attribute_label".$col_record->getId();?>" value="<?php echo $col_record->getAttributeLabel();?>" />
+            <?php if(!in_array($col_record->getAttributeCode(),$array)) { ?>
+            <button type="button" name="update" onclick="var answer = confirm('Do you want to Update?');if(answer) { updateRecord('<?php echo $url;?>','<?php echo $storeId;?>','<?php echo $col_record->getId();?>',document.getElementById('attribute_code<?php echo $col_record->getId();?>').value,document.getElementById('attribute_label<?php echo $col_record->getId();?>').value) } ;">Update</button>&nbsp;<button type="button" name="delete" onclick="var deleteanswer = confirm('Do you want to Delete?');if(deleteanswer) { deleteRecord('<?php echo $deleteurl;?>','<?php echo $col_record->getId();?>','<?php echo $storeId;?>')}";>Delete</button>
+            <?php } ?>
+        </div>
+        <?php
+    } ?>
+    <?php
+    }
+    else
+    {
+        echo "<div>No records</div>";
+    }?>
+</div>
+<div>
+    <form name="newattributeform" id="newattributeform" action="<?php echo Mage::helper("adminhtml")->getUrl('*/webextend_newattribute/save',array('store'=>$storeId));?>" onsubmit="return validateForm()">
+        <input type="hidden" name="storeId" value="<?php echo $storeId;?>">
+        <div class="emr_tbl header_label">
+            <strong>Name</strong>
+            <strong>Label</strong>
+            <?php /*<strong>Type</strong> */?>
+        </div>
+        <div class="field_wrapper">
+            <div class="emr_tbl emr_content" id="files">
+                <input type="text" name="field_name[]" id="field_name[]" value="" class="fieldName">
+                <input type="text" name="field_label[]" id="field_label[]" value="" class="fieldLabel">
+                <div style="clear: both;"></div>
+            </div>
+            <span><button type="button" id="button" value="button" onclick="addFile();">Add More Attribute</button></span>
+        </div>
+        <div style="clear: both;">&nbsp;</div>
+
+        <div>
+            <button type="submit" id="submit" value="Submit">Submit</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .emr_tbl.header_label strong{
+        min-width: 20%;display: inline-block;padding: 8px;margin: 0 8px;
+    }
+    .emr_content.emr_tbl input, .emr_content.emr_tbl select{
+        min-width: 19%;display: inline-block;margin: 8px;padding: 8px;
+    }
+    .emr_content.emr_tbl a{
+        padding: 8px;text-transform: uppercase;border: 1px solid #ddd;margin: 0 4px;color: #666;
+    }
+</style>

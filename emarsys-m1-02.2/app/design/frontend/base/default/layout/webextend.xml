@@ -1,0 +1,11 @@
+<layout version="0.1.0">
+    <default>
+        <reference name="before_body_end">
+            <block type="webextend/webextend" name="webextend" template="emarsys/webextend.phtml">
+                <block type="webextend/webextend" name="webextend.script" template="emarsys/javascripttracking.phtml">
+                    <action method="setCacheLifetime" ><lifetime>1</lifetime></action>
+                </block>
+            </block>
+        </reference>
+    </default>
+</layout>

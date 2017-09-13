@@ -1,0 +1,8 @@
+<config>
+  <modules>
+    <Emarsys_Suite2>
+      <active>true</active>
+      <codePool>community</codePool>
+    </Emarsys_Suite2>
+  </modules>
+</config>

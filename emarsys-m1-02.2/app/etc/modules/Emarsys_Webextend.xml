@@ -1,0 +1,11 @@
+<config>
+  <modules>
+    <Emarsys_Webextend>
+      <active>true</active>
+      <codePool>community</codePool>
+      <depends>
+          <Emarsys_Suite2 />
+      </depends>
+    </Emarsys_Webextend>
+  </modules>
+</config>

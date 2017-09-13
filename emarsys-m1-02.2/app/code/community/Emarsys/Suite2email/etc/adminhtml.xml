@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category   Suite2email
+ * @package    Emarsys_Suite2email
+ * @copyright  Copyright (c) 2016 Kensium Solution Pvt.Ltd. (http://www.kensiumsolutions.com/)
+ */
+-->
+<config>
+    <menu>
+        <suite2email module="suite2email">
+            <title>Emarsys Email</title>
+            <sort_order>80</sort_order>
+            <children>
+                <magentoevents module="suite2email">
+                    <title>Magento Events</title>
+                    <sort_order>0</sort_order>
+                    <action>adminhtml/suite2email_magentoevents</action>
+                </magentoevents>
+                <emarsysevents module="suite2email">
+                    <title>Emarsys Events</title>
+                    <sort_order>1</sort_order>
+                    <action>adminhtml/suite2email_emarsysevents</action>
+                </emarsysevents>
+                <mappingitems module="suite2email">
+                    <title>Emarsys Event Mapping</title>
+                    <sort_order>2</sort_order>
+                    <action>adminhtml/suite2email_eventmapping</action>
+                </mappingitems>
+            </children>
+        </suite2email>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <suite2email module="suite2email">
+                        <title>Emarsys Email</title>
+                        <sort_order>80</sort_order>
+                        <children>
+                            <magentoevents translate="title" module="suite2email">
+                                <title>Magento Events</title>
+                                <sort_order>0</sort_order>
+                            </magentoevents>
+                            <emarsysevents translate="title" module="suite2email">
+                                <title>Emarsys Events</title>
+                                <sort_order>1</sort_order>
+                            </emarsysevents>
+                            <mappingitems translate="title" module="suite2email">
+                                <title>Emarsys Event Mapping</title>
+                                <sort_order>2</sort_order>
+                            </mappingitems>
+                        </children>
+                    </suite2email>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

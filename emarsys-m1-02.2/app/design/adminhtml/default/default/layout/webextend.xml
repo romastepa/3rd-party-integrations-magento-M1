@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+	<default>
+        <reference name="head">
+			<action method="addJs"><name>emarsys/webextend.js</name></action>
+		</reference>
+	</default>
+    <adminhtml_webextend_attributemapping_index>
+        <reference name="content">
+            <block type="adminhtml/store_switcher" name="store_switcher" template="emarsys/store_switcher.phtml" />
+        </reference>
+        <reference name="content">
+            <block type="webextend/adminhtml_attributemapping" name="webextend" />
+        </reference>
+    </adminhtml_webextend_attributemapping_index>
+    <adminhtml_webextend_newattribute_index>
+        <reference name="content">
+            <block type="adminhtml/store_switcher" name="store_switcher" template="emarsys/store_switcher.phtml" />
+        </reference>
+        <reference name="content">
+            <block type="webextend/adminhtml_newattribute" name="webextend" template="emarsys/newattribute.phtml" />
+        </reference>
+    </adminhtml_webextend_newattribute_index>
+</layout>

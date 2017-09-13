@@ -1,0 +1,11 @@
+<config>
+  <modules>
+    <Emarsys_Suite2email>
+      <active>true</active>
+      <codePool>community</codePool>
+      <depends>
+          <Emarsys_Suite2 />
+      </depends>
+    </Emarsys_Suite2email>
+  </modules>
+</config>

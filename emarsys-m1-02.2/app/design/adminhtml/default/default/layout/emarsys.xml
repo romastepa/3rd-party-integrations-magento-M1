@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+	<default>
+        <reference name="head">
+			<action method="addJs"><name>emarsys/emarsys.js</name></action>
+            <action method="addItem">
+                <type>js_css</type>
+                <name>prototype/windows/themes/default.css</name>
+            </action>
+            <action method="addCss">
+                <name>lib/prototype/windows/themes/magento.css</name>
+            </action>
+		</reference>
+	</default>
+    <adminhtml_suite2email_eventmapping_index>
+		<reference name="content">
+            <block type="adminhtml/store_switcher" name="store_switcher" template="emarsys/store_switcher.phtml" />
+        </reference>
+        <reference name="content">
+            <block type="suite2email/adminhtml_eventmapping" name="suite2email" />
+        </reference>
+    </adminhtml_suite2email_eventmapping_index>
+    <adminhtml_suite2email_emarsysevents_index>
+        <reference name="content">
+            <block type="adminhtml/store_switcher" name="store_switcher" template="emarsys/store_switcher.phtml" />
+        </reference>
+    </adminhtml_suite2email_emarsysevents_index>
+    <adminhtml_suite2email_magentoevents_index>
+		<reference name="content">
+            <block type="adminhtml/store_switcher" name="store_switcher" template="emarsys/store_switcher.phtml" />
+        </reference>
+        <reference name="content">
+            <block type="suite2email/adminhtml_magentoevents" name="suite2email" />
+        </reference>
+    </adminhtml_suite2email_magentoevents_index>
+    <adminhtml_suite2email_emarsysevents_index>
+        <reference name="content">
+            <block type="suite2email/adminhtml_emarsysevents" name="suite2email" />
+        </reference>
+    </adminhtml_suite2email_emarsysevents_index>
+    <adminhtml_suite2email_placeholders_index>
+        <reference name="content">
+            <block type="suite2email/adminhtml_placeholders" name="suite2email" />
+        </reference>
+    </adminhtml_suite2email_placeholders_index>
+</layout>

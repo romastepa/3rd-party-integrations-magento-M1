@@ -1,0 +1,67 @@
+<?php
+$merchantId = $this->getMerchantId();
+$webExtendStatus = $this->getWebExtendEnabled();
+?>
+<?php if($webExtendStatus && !empty($merchantId)): ?>
+    <script type="text/javascript">
+        var ScarabQueue = ScarabQueue || [];
+        (function (subdomain, id) {
+            if (document.getElementById(id)) return;
+            var js = document.createElement('script');
+            js.id = id;
+            js.src = subdomain + '.scarabresearch.com/js/<?php echo $merchantId; ?>/scarab-v2.js';
+            var fs = document.getElementsByTagName('script')[0];
+            fs.parentNode.insertBefore(js, fs);
+        })('https:' == document.location.protocol ? 'https://recommender' : 'http://cdn', 'scarab-js-api');
+    </script>
+
+    <?php $testMode = Mage::getStoreConfig('webextendsection/webextendoptions/testmode'); ?>
+    <?php if($testMode):?>
+        <script>ScarabQueue.push(['testMode']);</script>
+    <?php endif;?>
+
+    <?php if ($this->getCurrentCategory() != ''): ?>
+        <script>ScarabQueue.push(['category', '<?php echo $this->getCurrentCategory();?>']);</script>
+    <?php endif; ?>
+
+    <?php if ($this->getCurrentProductSku() != ''): ?>
+        <script>ScarabQueue.push(['view', '<?php echo $this->getCurrentProductSku();?>']);</script>
+    <?php endif; ?>
+
+    <?php if ($this->getSearchResult() != ''): ?>
+        <script>ScarabQueue.push(['searchTerm', '<?php echo $this->getSearchResult();?>']);</script>
+    <?php endif; ?>
+
+    <?php /* Script for an Ajax to avoid caching Issues */ ?>
+    <?php $helper = Mage::helper('webextend'); ?>
+    <?php $pageData = array(); ?>
+    <?php if ($helper->isAjaxUpdateEnabled()) : ?>
+        <div id="webextend-code"></div>
+        <script type="text/javascript">
+            document.observe("dom:loaded", function() {
+                var unique_key_value = Math.random()*Math.random();
+                new Ajax.Request('<?php echo $this->getAjaxUpdateUrl() ?>', {
+                    method:'post',
+                    evalJS: true,
+                    parameters: {unique_key: unique_key_value},
+                    onSuccess: function(transport) {
+                        var response = JSON.parse(transport.responseText);
+                        if(response.status == 1) {
+                            <?php if($helper->useJQuery()): ?>
+                            jQuery('#webextend-code').html(response.content);
+                            <?php else: ?>
+                            $('webextend-code').update(response.content);
+                            <?php endif; ?>
+                        }
+                    }
+                });
+            });
+        </script>
+    <?php else: ?>
+        <?php echo $this->getChildHtml(); ?>
+    <?php endif; ?>
+<?php endif; ?>
+
+
+
+

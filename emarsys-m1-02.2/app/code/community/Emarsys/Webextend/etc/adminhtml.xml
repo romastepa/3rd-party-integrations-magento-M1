@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category   Webextend
+ * @package    Emarsys_Webextend
+ * @copyright  Copyright (c) 2017 Kensium Solution Pvt.Ltd. (http://www.kensiumsolutions.com/)
+ */
+-->
+<config>
+    <menu>
+        <suite2email>
+            <title>Emarsys</title>
+            <children>
+                <attributemapping translate="title" module="webextend">
+                    <title>Emarsys Attribute Mapping</title>
+                    <action>adminhtml/webextend_attributemapping</action>
+                </attributemapping>
+            </children>
+        </suite2email>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <webextendsection>
+                                        <title>WebExtend</title>
+                                    </webextendsection>
+                                    <catalogexport>
+                                        <title>Full Catalog Export</title>
+                                    </catalogexport>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                    <suite2email module="suite2email">
+                        <children>
+                            <attributemapping>
+                                <title>Emarsys Attribute Mapping</title>
+                            </attributemapping>
+                        </children>
+                    </suite2email>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

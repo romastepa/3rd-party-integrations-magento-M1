@@ -1,0 +1,557 @@
+<?xml version="1.0"?>
+<config>
+    <tabs>
+        <emarsys translate="label" module="emarsys_suite2">
+            <label>Emarsys connect</label>
+            <sort_order>450</sort_order>
+        </emarsys>
+    </tabs> 
+    
+    <sections>
+        <emarsys_suite2 translate="label" module="emarsys_suite2">
+            <label>Suite settings</label>
+            <tab>emarsys</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>10</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                    <queue translate="label">
+                    <label>Current queue</label>
+                    <expanded>true</expanded>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <queue translate="label">
+                            <label>Mapping</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_form_queue</frontend_model>
+                        </queue>
+                    </fields>
+                </queue>
+                <settings translate="label">
+                    <label>API settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </enabled>
+                        <api_endpoint>
+                            <label>API Endpoint</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>emarsys_suite2/system_config_api</source_model>
+                            <sort_order>5</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><enabled>1</enabled></depends> 
+                        </api_endpoint>
+                        <custom_api_endpoint>
+                            <label>Custom API URL</label>
+                            <frontend_type>text</frontend_type>
+                            <depends>
+                                <api_endpoint>custom</api_endpoint>
+                            </depends>
+                            <sort_order>6</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><enabled>1</enabled></depends> 
+                        </custom_api_endpoint>
+                        <debug translate="label">
+                            <label>Debug</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </debug>
+                        <profiler translate="label">
+                            <label>Plugin profiler</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><debug>1</debug></depends>
+                        </profiler>
+                        <clean_logs_button translate="button_label">
+                            <button_label>Clean module log files</button_label>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_button</frontend_model>
+                            <!--<frontend_type>button</frontend_type>-->
+                            <confirm_message>Do you want to clean ALL Emarsys debug logs?</confirm_message>
+                            <target_call>cleanLogs</target_call>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><debug>1</debug></depends>
+                        </clean_logs_button>
+                        
+                        <get_logs_button translate="button_label">
+                            <button_label>Download module log files</button_label>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_button</frontend_model>
+                            <!--<frontend_type>button</frontend_type>-->
+                            <confirm_message>Do you want to download ALL Emarsys debug logs?</confirm_message>
+                            <target_call>downloadLogs</target_call>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><debug>1</debug></depends>
+                        </get_logs_button>
+                        
+                        <cron_pinger translate="label">
+                            <label>Cron service API ping</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>emarsys_suite2/system_config_crontab_pinger</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <depends><enabled>1</enabled></depends>
+                            <show_in_store>0</show_in_store>
+                        </cron_pinger>
+                        <api_username translate="label">
+                            <label>Suite API Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </api_username>
+                        <api_password translate="label">
+                            <label>Suite API Password</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </api_password>
+                        <ping translate="button_label">
+                            <button_label>Test connection</button_label>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_button_pinger</frontend_model>
+                            <target>emarsys_suite2_settings</target>
+                            <sort_order>41</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </ping>
+                    </fields>
+                </settings>
+            </groups>
+        </emarsys_suite2>
+        <emarsys_suite2_contacts_sync translate="label" module="emarsys_suite2">
+            <label>Contacts synchronization</label>
+            <tab>emarsys</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>20</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <field_mapping translate="label">
+                    <label>Field mapping</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <mapping translate="label">
+                            <label>Mapping</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <backend_model>emarsys_suite2/system_config_backend_fieldmap</backend_model>
+                        </mapping>
+                        <mapping_form translate="label">
+                            <label>Mapping</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_form_mapping</frontend_model>
+                        </mapping_form>
+                    </fields>
+                </field_mapping>
+                <settings translate="label">
+                    <label>Synchronization settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+<!--                        Customers export area-->
+                        <customerslist_export_enabled>
+                            <label>Enable Customers export</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </customerslist_export_enabled>
+                        <emarsys_secure_url>
+                            <label>Use Secure Notification URL</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </emarsys_secure_url>
+                        <export_customers_button translate="button_label">
+                            <button_label>Export customers</button_label>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_button</frontend_model>
+                            <!--<frontend_type>button</frontend_type>-->
+                            <confirm_message>Do you want to export ALL customers?</confirm_message>
+                            <target_call>exportCustomers</target_call>
+                            <sort_order>12</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><customerslist_export_enabled>1</customerslist_export_enabled></depends>
+                        </export_customers_button>
+<!--                        Subscribers export area -->
+                        <subscriberslist_export_enabled>
+                            <label>Enable Subscribers export</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </subscriberslist_export_enabled>
+                        <export_subscribers_button translate="button_label">
+                            <button_label>Export subscribers</button_label>
+                            <confirm_message>Do you want to export ALL subscribers?</confirm_message>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_button</frontend_model>
+                            <target_call>exportSubscribers</target_call>
+                            <sort_order>22</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><subscriberslist_export_enabled>1</subscriberslist_export_enabled></depends>
+                        </export_subscribers_button>
+                        <mode translate="label">
+                            <label>Synchronization mode</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>emarsys_suite2/system_config_mode</source_model>
+                        </mode>
+                        <crontab translate="label">
+                            <label>Background runtime</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>emarsys_suite2/system_config_crontab</source_model>
+                            <comment>Cron background export task execution time. Might differ from local time, depending on system settings.</comment>
+                        </crontab>
+                        <notification_secret>
+                            <label>Notification secret key</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>emarsys_suite2/system_config_crontab</source_model>
+                            <comment>Secret key for export notification URLs</comment>
+                        </notification_secret>
+                        <email_as_id translate="label comment">
+                            <label>Key id</label>
+                            <comment>Use Key ID</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>emarsys_suite2/system_config_keyid</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>key id used in suite</comment>
+                        </email_as_id>
+                    </fields>
+                </settings>                
+            </groups>
+        </emarsys_suite2_contacts_sync>
+        <emarsys_suite2_transmail>
+            <label>Transactional Mail setup</label>
+            <tab>emarsys</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>30</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <settings translate="label">
+                    <label>Transactional Mail setup</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <enabled>
+                            <label>Enable Emarsys transactional mails</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>                            
+                        </enabled>
+                    </fields>
+                </settings>
+                <registry translate="label">
+                    <label>Event registration</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>                        
+                        <events_form translate="label">
+                            <label>Mapping</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_form_transmail</frontend_model>
+                        </events_form>
+                        <events>
+                            <frontend_type>text</frontend_type>
+                            <backend_model>emarsys_suite2/system_config_backend_email_event</backend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </events>
+                    </fields>
+                </registry>
+<!--                        <mapping translate="label">
+                            <label>Mapping</label>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_field_mapping</frontend_model>
+                        </mapping>-->
+            </groups>
+        </emarsys_suite2_transmail>
+        
+        
+        <emarsys_suite2_smartinsight translate="label" module="emarsys_suite2">
+            <label>Smart Insight</label>
+            <tab>emarsys</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>50</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>0</show_in_store>
+            <groups>
+                <settings translate="label">
+                    <label>Smart Insight settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+<!--                        Customers export area-->
+                        <enabled>
+                            <label>Smart Insight enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>1</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>                            
+                        </enabled>
+                        <email_as_id>
+                            <label>Export using email as identifier</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>                            
+                        </email_as_id>
+                        <guest_export>
+                            <label>Export guest checkout orders</label>
+                            <depends><email_as_id>1</email_as_id></depends>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>11</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>                            
+                        </guest_export>
+                        <crontab translate="label">
+                            <label>Execute at</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>emarsys_suite2/system_config_crontab</source_model>
+                            <comment>Cron background export task execution time. Might differ from local time, depending on system settings.</comment>
+                            <depends><enabled>1</enabled></depends>
+                        </crontab>                        
+                        <bundle_include>
+                            <label>Include Bundle products</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <depends><enabled>1</enabled></depends>
+                        </bundle_include>
+                        <use_base_currency>
+                            <label>Use Base Currency in Export</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>21</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <depends><enabled>1</enabled></depends>
+                            <comment>Please do not change the option after the initial setup</comment>
+                        </use_base_currency>
+                        <bundle_price_calculated>
+                            <label>Calculated bundle price</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <depends>
+                                <bundle_include>1</bundle_include>
+                                <enabled>1</enabled>
+                            </depends>
+                            <comment>Set to yes if you want to have total bundle price in bundle product (no will set it to zero)</comment>
+                        </bundle_price_calculated>
+                        <export_orders_button translate="button_label">
+                            <label>Last two years orders export</label>
+                            <button_label>Generate Now</button_label>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_button_export_orders</frontend_model>
+                            <frontend_type>button</frontend_type>
+                            <confirm_message>Do you want to export ALL orders for last two years?</confirm_message>
+                            <target_call>exportAllOrders</target_call>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><enabled>1</enabled></depends>
+                        </export_orders_button>
+                    </fields>
+                </settings>
+                <ftp translate="label">
+                    <label>FTP settings</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>0</show_in_store>
+                    <fields>
+                        <host>
+                            <label>Hostname</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </host>
+                        <user translate="label">
+                            <label>Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </user>
+                        <password translate="label">
+                            <label>Password</label>
+                            <frontend_type>password</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </password>
+                        <dir translate="label">
+                            <label>Directory</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </dir>
+                        <ssl translate="label">
+                            <label>Use FTP over SSL (FTPS)</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>                            
+                        </ssl>
+                        <passive translate="label">
+                            <label>Use passive mode</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>                            
+                        </passive>                        
+                        <ping translate="button_label">
+                            <button_label>Test connection</button_label>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_button_pinger</frontend_model>
+                            <target>emarsys_suite2_smartinsight_ftp</target>
+                            <target_group_name>ftp</target_group_name>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>0</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </ping>
+                    </fields>
+                </ftp>
+            </groups>
+        </emarsys_suite2_smartinsight>
+                
+    </sections>
+</config>

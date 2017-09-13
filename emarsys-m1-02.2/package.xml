@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<package>
+    <name>Emarsys_Suite2</name>
+    <version>0.1.2</version>
+    <stability>devel</stability>
+    <license uri="http://www.emarsys.com/en/terms-conditions">Emarsys Terms &amp; Conditions</license>
+    <channel>community</channel>
+    <extends/>
+    <summary>A turnkey solution to phttp://emarsys.clients.smile.fr/ee14/index.php/admin/extension_custom/index/key/389aab0217a44369d25d7781fe5fd6400049b8f17590457e52029898a186aa4d/#lug your Emarsys Emarketing Suite directly into your Magento shop.</summary>
+    <description>ENGAGE CUSTOMERS - Emarsys triggers automated marketing communications to keep customers coming back to your Magento site. &#xD;
+VIP TREATMENT - Identify your most valuable customers and target them with tailored incentives. &#xD;
+MANAGE YOUR INVENTORY - Stock clearance campaigns are easy with Smart Insight&#x2019;s product affinity reports. &#xD;
+SOCIAL RETARGETING - Follow up your email campaigns with personalized social ads. &#xD;
+&#xD;
+FEATURES &#xD;
+* Real-time synchronization of Magento contacts to your eMarketing Suite &#xD;
+* Excellent deliverability through our built-in double opt-in process &#xD;
+* Integration of Emarsys transactional mails with your Magento site &#xD;
+* Send all your purchase data and product catalogue to Smart Insight</description>
+    <notes>Version 0.1.2&#xD;
+Updated CDN API Url&#xD;
+&#xD;
+Version 0.1.1&#xD;
+Fixed crash when custom_entry_point changed by 3rd party plugins&#xD;
+&#xD;
+Version 0.1.0&#xD;
+Added option to change order of contacts sync (import &gt; export / export &gt; import)&#xD;
+Fieldmapping now works correctly when one of the websites have misconfigured or disabled API&#xD;
+&#xD;
+Version 0.0.9&#xD;
+Removed checkids call, replaced POST/PUT updates to PUT with flag create_if_not_exists=1, so now only one api call will be done when creating/saving customer.&#xD;
+Fixed Website level mapping.&#xD;
+&#xD;
+Version 0.0.7&#xD;
+Added order export flagging for SmartInsight&#xD;
+&#xD;
+Version 0.0.6&#xD;
+Minor table changes for email_vars to avoid duplicates.&#xD;
+Added mass queue cleanup for order export.&#xD;
+Fixed SmartInsight order export.&#xD;
+&#xD;
+Version 0.0.5&#xD;
+Added a switch for key identifier to be either standard Magento ID or email.&#xD;
+Fixed memory leaks on mass export.&#xD;
+Fixed minor JS issue in transactional mails happening when saved empty form data.&#xD;
+Now doing multiple insertion when queuing mass export, instead of insert per entity.&#xD;
+Created run-time rewrite of transactional mail template to avoid conflicts with other modules that may rewrite core/email_template class&#xD;
+Added event listener for crontab rewriting of core/email_template&#xD;
+Added unique index on queue table to avoid entity duplication&#xD;
+Removed name "Magento Subscriber" for subscriber records pushed from Magento&#xD;
+&#xD;
+Version 0.0.4&#xD;
+Fixed PHP warnings caused by too customized back-end forms&#xD;
+Added batch size for full customers export (batch size=500)&#xD;
+Added batch size for full subscribers export (batch size=500)&#xD;
+Added batch size for last 2 years orders export (batch size=500)&#xD;
+Added a lot of profiling code and profiler logging when debug is enabled&#xD;
+Added a button to clean module logs via back-end&#xD;
+Added a button to download module logs via back-end (generates zip, requires PHP ZipArchive)&#xD;
+&#xD;
+Version 0.0.3&#xD;
+Fixed a slow export issue caused by flaw in queue cleaning algorithm.&#xD;
+&#xD;
+Version 0.0.2&#xD;
+Release version of Emarsys Suite v2 extension</notes>
+    <authors><author><name>Smile</name><user>smile</user><email>servicedesk@smile.nl</email></author></authors>
+    <date>2016-07-29</date>
+    <time>10:38:10</time>
+    <contents><target name="magecommunity"><dir name="Emarsys"><dir name="Suite2"><dir name="Block"><dir name="Adminhtml"><dir name="Form"><dir name="Element"><file name="Select.php" hash="766813bd167b092fbc42541d7c3013fc"/></dir></dir><dir name="System"><dir name="Config"><dir name="Button"><dir name="Export"><file name="Orders.php" hash="207e79553491bdbea502118e8f04cf91"/></dir><file name="Export.php" hash="b2d07be76e1a113d3d5b93709809b77b"/><file name="Pinger.php" hash="9888c0696b43101fbfe7e99661fcfbed"/></dir><file name="Button.php" hash="7b2c4b40dadeb78d02b30e39175c0f2d"/><dir name="Form"><file name="Abstract.php" hash="04fc07a1b06bc9bfaea3ca2e567e7ff2"/><file name="Mapping.php" hash="127b1bef54cd90ca5a6c38940460c6b5"/><file name="Queue.php" hash="e076f300e5e6860077a5902f7608e169"/><file name="Transmail.php" hash="f7fbabd10878724fd10d6787669a89b3"/></dir></dir></dir></dir></dir><dir name="Helper"><file name="Adminhtml.php" hash="2082f9a7e66e0825a4f760d5f920c21c"/><file name="Country.php" hash="873120155ce109f012727f93231f692a"/><file name="Data.php" hash="250f93415732d70ec64497b616acc644"/></dir><dir name="Model"><dir name="Adapter"><dir name="Http"><file name="Curl.php" hash="cd79c3223f4f3e03d999dbba2633ac55"/></dir></dir><dir name="Api"><file name="Abstract.php" hash="62c53dad15696f57cafa643bc41ed572"/><file name="Customer.php" hash="4b43ecd8137b1c440a35f065922cbbba"/><file name="Event.php" hash="b2838a8339d5c8e83625a47d58e35c80"/><file name="Order.php" hash="a42e3c7298445f99330eb2c81d872630"/><dir name="Payload"><file name="Abstract.php" hash="19aa81633531addc4cc65c8b437f8e07"/><file name="Creditmemo.php" hash="b49080f0c3a80354637820e8ba220227"/><dir name="Customer"><dir name="Item"><file name="Collection.php" hash="32ce9968132d81315b41c6f94c62978e"/></dir><file name="Item.php" hash="b390925bef2316d8055d2acb2c3ad88a"/></dir><file name="Order.php" hash="7133220de646c116ea69655b9284f7e2"/><dir name="Subscriber"><dir name="Item"><file name="Collection.php" hash="48f6ebf6d3c557f06b73ce60468c6cbe"/></dir><file name="Item.php" hash="358bdceb454984478d0d585bb848e0db"/></dir></dir><file name="Subscriber.php" hash="430f4cfd4a643f49fac75b3cbe9e6dfe"/></dir><file name="Api.php" hash="541bb06e7f62418c6c508eb69a3f7739"/><file name="Config.php" hash="6b5c13cfc44f4b8ccd33aaa3e6ec8371"/><file name="Debug.php" hash="9722ae78277bd816085d879c1041aae5"/><dir name="Email"><file name="Event.php" hash="ede48a11782eb020d829508db6de2c2a"/><dir name="Template"><file name="Filter.php" hash="9172faef4fc0c86cbb5fd0f1c102cdf6"/></dir><file name="Template.php" hash="d404c9f27b134fd130b5d037aabf1fc4"/><file name="Var.php" hash="95bc09232f4e054654d844141ce43215"/></dir><dir name="Flag"><file name="Creditmemo.php" hash="4604965209232ad66636c0db80d9dbe7"/><file name="Order.php" hash="62f0ed30d31bd257079c488030c5b1d2"/></dir><file name="Observer.php" hash="8a1a24e74b3c386b8afbe77c809d5140"/><file name="Order.php" hash="b5b60e1a1358e6269d6d07e8912619d6"/><file name="Predict.disabled.php" hash="6d354cf3a3907ce98ece0382a551e087"/><file name="Queue.php" hash="a8f10f0879192105212b80974c5ad1a5"/><dir name="Resource"><dir name="Email"><dir name="Event"><file name="Collection.php" hash="d034961fdab5ac2e5c02900cd0d8f126"/></dir><file name="Event.php" hash="efc7fb6ab448bac77dd8a4af80020811"/><dir name="Var"><file name="Collection.php" hash="2e974642a1c329b54bdf5269e67e320d"/></dir><file name="Var.php" hash="33c500fb7827511a1a66d74e9012de0f"/></dir><dir name="Flag"><file name="Creditmemo.php" hash="a9ad5ab2a86b398134f4847002036878"/><file name="Order.php" hash="17020f6cffc8389d14ec7be7d38289b3"/></dir><dir name="Queue"><file name="Collection.php" hash="1f2b47bb841794eea2a6b887bfeca5f8"/></dir><file name="Queue.php" hash="25c286e2aeec24cf87272b72ebdce5c5"/></dir><dir name="System"><dir name="Config"><file name="Api.php" hash="8183268015352b1cbc1d2109f17c6192"/><dir name="Backend"><dir name="Email"><file name="Event.php" hash="f7e38110c084f580fbe1531d78fcfef9"/></dir><file name="Fieldmap.php" hash="e137216e728b2d2cdacb4069356988d5"/></dir><dir name="Crontab"><file name="Pinger.php" hash="6174fdf726312b6b405178f7adf90074"/></dir><file name="Crontab.php" hash="5edd64511b4c5e07d096a23aec1ec10d"/><file name="Keyid.php" hash="7dacd0beac6a4ff55e38a07c1d4c5ef5"/><file name="Mode.php" hash="9a744753728e69257876e56038d00546"/><file name="Syncorder.php" hash="8e952810efc5197de7c58153293622a9"/></dir></dir></dir><dir name="Tests"><file name="BackendTest.php" hash="fdac2adcd08847728cbab9345ecf640d"/><file name="FrontendTest.php" hash="0f23476996a7f6c4f1214b36b95f70df"/><file name="test.bat" hash="a409fdf339b2df0f333dc628ebbc9f5b"/></dir><dir name="controllers"><dir name="Adminhtml"><file name="Suite2Controller.php" hash="6c0896937bed772e630dfbe1a15088dd"/></dir><file name="IndexController.php" hash="1c7051aee4665c47453744fccae14ad6"/></dir><dir name="data"><dir name="emarsys_suite2_setup"><file name="data-install-0.0.1.php" hash="e792476bbbf92f531c0abf6d4540aff5"/><file name="data-upgrade-0.0.1-0.0.2.php" hash="a0db3fd851a0a15175642d28c8b25b0f"/></dir></dir><dir name="etc"><file name="config.xml" hash="4c9be98c0af0f001f295dd90ae030472"/><file name="system.xml" hash="8a2a60834d930066c7a68e5c7fd48b81"/></dir><dir name="sql"><dir name="emarsys_suite2_setup"><file name="install-0.0.1.php" hash="b1265d3ea3538b4faaa678b64b3835c9"/><file name="upgrade-0.0.4-0.0.5.php" hash="e0c2ac5e40750058091f2c22f91e1839"/><file name="upgrade-0.0.5-0.0.6.php" hash="348c8026dd9c84a486838614f0bda972"/><file name="upgrade-0.0.6-0.0.7.php" hash="4a5165cd6b176ebbc659c057607872dc"/></dir></dir></dir></dir></target><target name="mageetc"><dir name="modules"><file name="Emarsys_Suite.xml" hash="017c37c2815cad4744d0459c4a5eebf9"/><file name="Emarsys_Suite2.xml" hash="b07e8a47be32bc90c8ac96e40f722aec"/></dir></target></contents>
+    <compatible/>
+    <dependencies><required><php><min>5.3.1</min><max>6.0.0</max></php><extension><name>Core</name><min/><max/></extension></required></dependencies>
+</package>
