@@ -190,7 +190,8 @@ class Emarsys_Suite2_Adminhtml_Suite2Controller extends Mage_Adminhtml_Controlle
             $pageNum = 0;
             while ($this->_queueCollectionBatch(
                 Mage::getResourceModel('customer/customer_collection')
-                    ->joinField('subscriber_id', 'newsletter/subscriber', 'subscriber_id', 'customer_id = entity_id', 'null', 'left'),
+                    ->joinField('subscriber_id', 'newsletter/subscriber', 'subscriber_id', 'customer_id = entity_id', null, 'left')
+                    ->groupByAttribute('entity_id'),
                 $pageNum++
             )) {
                 $result = true;
