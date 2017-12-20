@@ -158,7 +158,10 @@ class Emarsys_Suite2_Adminhtml_Suite2Controller extends Mage_Adminhtml_Controlle
         $pageNum = 1;
         $result = false;
         try {
-            while ($this->_queueCollectionBatch(Mage::getResourceModel('customer/customer_collection'), $pageNum++)) {
+            while ($this->_queueCollectionBatch(
+                Mage::getResourceModel('customer/customer_collection'),
+                $pageNum++
+            )) {
                 $result = true;
             }
 
@@ -183,15 +186,8 @@ class Emarsys_Suite2_Adminhtml_Suite2Controller extends Mage_Adminhtml_Controlle
         try {
             $pageNum = 0;
             // Queue all anonymous subscribers
-            while ($this->_queueCollectionBatch(Mage::getResourceModel('newsletter/subscriber_collection'), $pageNum++)) {
-                $result = true;
-            }
-
-            $pageNum = 0;
             while ($this->_queueCollectionBatch(
-                Mage::getResourceModel('customer/customer_collection')
-                    ->joinField('subscriber_id', 'newsletter/subscriber', 'subscriber_id', 'customer_id = entity_id', null, 'left')
-                    ->groupByAttribute('entity_id'),
+                Mage::getResourceModel('newsletter/subscriber_collection'),
                 $pageNum++
             )) {
                 $result = true;
