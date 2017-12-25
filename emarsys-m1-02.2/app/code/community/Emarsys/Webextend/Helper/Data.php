@@ -8,8 +8,9 @@
  */
 class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    const XML_PATH_AJAX_UPDATE_ENABLED   = 'webextendsection/webextendoptions/ajaxupdate';
-    const XML_PATH_USE_JQUERY_ENABLED   = 'webextendsection/webextendoptions/usejquery';
+    const XML_PATH_AJAX_UPDATE_ENABLED = 'webextendsection/webextendoptions/ajaxupdate';
+    const XML_PATH_USE_JQUERY_ENABLED = 'webextendsection/webextendoptions/usejquery';
+    const XML_PATH_EXPORT_TYPE = 'catalogexport/configurable_cron/type';
 
     /**
      * Static Array of Required Emarsys attribute Fields
@@ -43,15 +44,15 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Moving File to FTP
-     * @param $websiteId
+     * @param $storeId
      * @param $outputFile
      * @param $ftpConnection
      * @param $filePath
      */
-    public function moveToFTP($websiteId, $outputFile, $ftpConnection, $filePath)
+    public function moveToFTP($storeId, $outputFile, $ftpConnection, $filePath)
     {
-        $bulkDir = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/dir', $websiteId);
-        $passiveMode = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/passive', $websiteId);
+        $bulkDir = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/dir', $storeId);
+        $passiveMode = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/passive', $storeId);
 
         $remoteDirPath = $bulkDir;
         if ($remoteDirPath == '/') {
@@ -143,5 +144,14 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
     public function useJQuery()
     {
         return (bool)Mage::getStoreConfig(self::XML_PATH_USE_JQUERY_ENABLED);
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    public function isConsolidatedExport()
+    {
+        return (Mage::getStoreConfig(self::XML_PATH_EXPORT_TYPE) == Emarsys_Webextend_Model_System_Config_Options_Exporttype::TYPE_CONSOLIDATED);
     }
 }
