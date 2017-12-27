@@ -9,16 +9,15 @@
 class Emarsys_Webextend_Model_Observer
 {
     protected $_credentials = array();
+    protected $_websites = array();
 
     /**
      * Catalog Export Function which will call from Cron
      */
     public function catalogExport()
     {
+        return $this->consolidatedCatalogExport();
         try {
-            if (Mage::helper('webextend')->isConsolidatedExport()) {
-                return $this->consolidatedCatalogExport();
-            }
             set_time_limit(0);
             $staticExportArray = Mage::helper('webextend')->getstaticExportArray();
             $staticMagentoAttributeArray = Mage::helper('webextend')->getstaticMagentoAttributeArray();
@@ -323,22 +322,32 @@ class Emarsys_Webextend_Model_Observer
                     //Login to FTP
                     $ftpLogin = @ftp_login($ftpConnection, $username, $password);
                     if ($ftpLogin) {
-
-                        if (Mage::helper('webextend')->isConsolidatedExport()) {
-                            $websiteId = 1;
-                        } else {
-                            $websiteId = $store->getWebsiteId();
-                        }
-                        $this->_credentials[$websiteId][$storeId]['store'] = $store;
-                        $this->_credentials[$websiteId][$storeId]['ftp_connection'] = $ftpConnection;
-
+                        $websiteId = $this->getWebsiteId($store);
+                        $this->_credentials[$this->_getWebsiteId($store)][$storeId]['store'] = $store;
                         $this->getMappedAttributes($websiteId, $storeId);
+                        $this->_credentials[$websiteId][$storeId]['ftp_connection'] = $ftpConnection;
                     } else {
                         Mage::helper('emarsys_suite2')->log("Unable to connect FTP for Store ID: " . $storeId, $this);
                     }
                 }
             }
         }
+    }
+
+    /**
+     * Get Grouped WebsiteId
+     *
+     * @param Mage_Core_Model_Store $store
+     * @return int
+     */
+    public function getWebsiteId($store)
+    {
+        $apiUserName = Mage::getStoreConfig('emarsys_suite2/settings/api_username', $store);
+        if (!isset($this->_websites[$apiUserName])) {
+            $this->_websites[$apiUserName] = $store->getWebsiteId();
+        }
+
+        return $this->_websites[$apiUserName];
     }
 
     /**

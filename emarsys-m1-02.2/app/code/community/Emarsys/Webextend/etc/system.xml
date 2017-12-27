@@ -152,16 +152,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </fullcatalogexportenabled>
-                        <type translate="label">
-                            <label>Export Type</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>webextend/system_config_options_exporttype</source_model>
-                            <comment><![CDATA[Consolidated - one file for all websites.</br>Separated - one file per website.]]></comment>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>0</show_in_website>
-                            <show_in_store>0</show_in_store>
-                        </type>
                         <webextenproductstatus translate="label">
                             <label>Include Disabled Products</label>
                             <frontend_type>select</frontend_type>

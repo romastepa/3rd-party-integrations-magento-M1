@@ -10,7 +10,6 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
 {
     const XML_PATH_AJAX_UPDATE_ENABLED = 'webextendsection/webextendoptions/ajaxupdate';
     const XML_PATH_USE_JQUERY_ENABLED = 'webextendsection/webextendoptions/usejquery';
-    const XML_PATH_EXPORT_TYPE = 'catalogexport/configurable_cron/type';
 
     /**
      * Static Array of Required Emarsys attribute Fields
@@ -144,14 +143,5 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
     public function useJQuery()
     {
         return (bool)Mage::getStoreConfig(self::XML_PATH_USE_JQUERY_ENABLED);
-    }
-
-    /**
-     *
-     * @return bool
-     */
-    public function isConsolidatedExport()
-    {
-        return (Mage::getStoreConfig(self::XML_PATH_EXPORT_TYPE) == Emarsys_Webextend_Model_System_Config_Options_Exporttype::TYPE_CONSOLIDATED);
     }
 }
