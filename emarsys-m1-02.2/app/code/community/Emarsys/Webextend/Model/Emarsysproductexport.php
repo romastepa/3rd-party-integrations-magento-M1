@@ -110,7 +110,7 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
         $io->streamLock(true);
         $io->streamWriteCsv($this->_mapHeader);
 
-        foreach ($this->_prepareData() as $item) {
+        foreach ($this->_prepearedData as $item) {
             $io->streamWriteCsv(Mage::helper("core")->getEscapedCSVData($item));
         }
 

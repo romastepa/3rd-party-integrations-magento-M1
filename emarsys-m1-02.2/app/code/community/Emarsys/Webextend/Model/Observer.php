@@ -323,7 +323,7 @@ class Emarsys_Webextend_Model_Observer
                     $ftpLogin = @ftp_login($ftpConnection, $username, $password);
                     if ($ftpLogin) {
                         $websiteId = $this->getWebsiteId($store);
-                        $this->_credentials[$this->_getWebsiteId($store)][$storeId]['store'] = $store;
+                        $this->_credentials[$websiteId][$storeId]['store'] = $store;
                         $this->getMappedAttributes($websiteId, $storeId);
                         $this->_credentials[$websiteId][$storeId]['ftp_connection'] = $ftpConnection;
                     } else {

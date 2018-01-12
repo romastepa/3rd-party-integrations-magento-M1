@@ -192,6 +192,17 @@
                             <show_in_store>0</show_in_store>
                             <depends><fullcatalogexportenabled>1</fullcatalogexportenabled></depends>
                         </frequency>
+                        <export_products_button translate="button_label">
+                            <button_label>Full Catalog Export</button_label>
+                            <frontend_model>emarsys_suite2/adminhtml_system_config_button</frontend_model>
+                            <confirm_message>Do you want to make Full Catalog Export?</confirm_message>
+                            <target_call>exportFullCatalog</target_call>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <depends><fullcatalogexportenabled>1</fullcatalogexportenabled></depends>
+                        </export_products_button>
                     </fields>
                 </configurable_cron>
             </groups>
