@@ -150,6 +150,10 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
 
                     if (!isset($this->_prepearedData[$productId])) {
                         $this->_prepearedData[$productId] = array_fill(0, count($this->_mapHeader), "");
+                    } else {
+                        $processed = $this->_prepearedData[$productId];
+                        $this->_prepearedData[$productId] = array_fill(0, count($this->_mapHeader), "");
+                        $this->_prepearedData[$productId] = $processed + $this->_prepearedData[$productId];
                     }
 
                     foreach ($item['data'] as $key => $value) {
@@ -175,7 +179,7 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
     public function prepareHeader($storeCode, $header)
     {
         if (!array_key_exists($storeCode, $this->_processedStores)) {
-            // $this->_processedStores[$storeCode] = array(oldKey, newKey);
+            // $this->_processedStores[$storeCode] = array(oldKey => newKey);
             foreach ($header as $key => &$value) {
                 if ($value == 'Item') {
                     unset($header[$key]);
