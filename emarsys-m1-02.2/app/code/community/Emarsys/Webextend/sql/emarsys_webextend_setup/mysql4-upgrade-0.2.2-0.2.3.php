@@ -25,4 +25,9 @@ $productExportTable = $installer->getConnection()
 
 $installer->getConnection()->createTable($productExportTable);
 
+$tableName = $installer->getTable('webextend/emarsysproductattributes');
+
+$installer->getConnection()
+    ->query('UPDATE ' . $tableName . ' SET attribute_code = REPLACE(LOWER(TRIM(attribute_code)), " ", "_")');
+
 $installer->endSetup();

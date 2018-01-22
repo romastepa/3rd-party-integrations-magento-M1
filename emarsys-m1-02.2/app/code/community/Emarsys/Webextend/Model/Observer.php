@@ -19,8 +19,8 @@ class Emarsys_Webextend_Model_Observer
         return $this->consolidatedCatalogExport();
         try {
             set_time_limit(0);
-            $staticExportArray = Mage::helper('webextend')->getstaticExportArray();
-            $staticMagentoAttributeArray = Mage::helper('webextend')->getstaticMagentoAttributeArray();
+            $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
+            $staticMagentoAttributeArray = Mage::helper('webextend')->getStaticMagentoAttributeArray();
             $allStores = Mage::app()->getStores();
             foreach ($allStores as $store) {
                 $counter = 0;
@@ -358,8 +358,8 @@ class Emarsys_Webextend_Model_Observer
      */
     public function getMappedAttributes($websiteId, $storeId)
     {
-        $staticExportArray = Mage::helper('webextend')->getstaticExportArray();
-        $staticMagentoAttributeArray = Mage::helper('webextend')->getstaticMagentoAttributeArray();
+        $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
+        $staticMagentoAttributeArray = Mage::helper('webextend')->getStaticMagentoAttributeArray();
         $emarsysFieldNames = array();
         $magentoAttributeNames = array();
 

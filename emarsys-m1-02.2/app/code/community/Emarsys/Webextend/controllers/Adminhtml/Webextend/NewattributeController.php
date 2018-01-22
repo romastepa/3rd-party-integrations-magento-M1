@@ -64,8 +64,8 @@ class Emarsys_Webextend_Adminhtml_Webextend_NewattributeController extends Mage_
             $storeId = $data['storeId'];
             if ($data['field_name'][0] != "") {
                 for ($i = 0; $i < count($data['field_name']); $i++) {
-                    $field_name = $data['field_name'][$i];
-                    $field_label = $data['field_label'][$i];
+                    $field_code = str_replace(' ', '_', strtolower(trim($data['field_name'][$i])));
+                    $field_label = trim($data['field_label'][$i]);
 
                     //Checking for attribute code duplicates
                     $model = Mage::getModel('webextend/emarsysproductattributes');
@@ -77,18 +77,18 @@ class Emarsys_Webextend_Adminhtml_Webextend_NewattributeController extends Mage_
                             'attribute_label'
                         ),
                         array(
+                            array('eq' => $field_code),
                             array('eq' => $field_label),
-                            array('eq' => $field_name),
                         )
                     );
                     if (!$collection->count()) {
-                        if (!in_array($field_name, $array) || !in_array($field_label, $array)) {
+                        if (!in_array($field_code, $array) || !in_array($field_label, $array)) {
                             $model = Mage::getModel('webextend/emarsysproductattributes');
-                            if (strstr($field_name, 'c_')) {
-                                $model->setAttributeCode($field_name);
+                            if (strstr($field_code, 'c_')) {
+                                $model->setAttributeCode($field_code);
                             } else {
-                                $field_name = "c_" . $field_name;
-                                $model->setAttributeCode($field_name);
+                                $field_code = "c_" . $field_code;
+                                $model->setAttributeCode($field_code);
                             }
                             if (strstr($field_label, 'c_')) {
                                 $model->setAttributeLabel($field_label);
@@ -100,7 +100,7 @@ class Emarsys_Webextend_Adminhtml_Webextend_NewattributeController extends Mage_
                             $model->save();
                         }
                     } else {
-                        Mage::getSingleton("adminhtml/session")->addNotice(Mage::helper("adminhtml")->__($field_name . " Attribute can not be added as its already Exists!"));
+                        Mage::getSingleton("adminhtml/session")->addNotice(Mage::helper("adminhtml")->__($field_code . " Attribute can not be added as its already Exists!"));
                     }
                 }
             }

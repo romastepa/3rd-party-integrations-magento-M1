@@ -25,9 +25,9 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
      * get Static Export Array for Emarsys
      * @return array
      */
-    public function getstaticExportArray()
+    public function getStaticExportArray()
     {
-        $staticExportArray = array("Item", "Available", "Title", "Link", "Image", "Category", "Price");
+        $staticExportArray = array("item", "available", "title", "link", "image", "category", "price");
         return $staticExportArray;
     }
 
@@ -35,7 +35,7 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
      * get Static Export Array for Magento
      * @return array
      */
-    public function getstaticMagentoAttributeArray()
+    public function getStaticMagentoAttributeArray()
     {
         $staticMagentoAttributeArray = array("sku", "is_saleable", "name", "url_key", "image", "category_ids", "price");
         return $staticMagentoAttributeArray;
