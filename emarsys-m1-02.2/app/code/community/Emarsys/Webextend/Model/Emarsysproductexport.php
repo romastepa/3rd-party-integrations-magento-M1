@@ -10,7 +10,7 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
 
     protected $_prepearedData = array();
 
-    protected $_mapHeader = array('Item');
+    protected $_mapHeader = array('item');
 
     protected $_processedStores = array();
     /**
