@@ -122,6 +122,8 @@ class Emarsys_Webextend_Adminhtml_Webextend_NewattributeController extends Mage_
             $attribute_code = $this->getRequest()->getParam('attribute_code');
             $attribute_label = $this->getRequest()->getParam('attribute_label');
 
+            $attribute_code = str_replace(' ', '_', strtolower(trim($attribute_code)));
+
             //Checking for attribute code duplicates
             $model = Mage::getModel('webextend/emarsysproductattributes');
             $collection = $model->getCollection();

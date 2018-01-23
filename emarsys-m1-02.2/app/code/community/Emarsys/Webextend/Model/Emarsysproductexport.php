@@ -181,7 +181,7 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
         if (!array_key_exists($storeCode, $this->_processedStores)) {
             // $this->_processedStores[$storeCode] = array(oldKey => newKey);
             foreach ($header as $key => &$value) {
-                if ($value == 'Item') {
+                if (strtolower($value) == 'item') {
                     unset($header[$key]);
                     $this->_processedStores[$storeCode] = array($key => 0);
                     continue;
