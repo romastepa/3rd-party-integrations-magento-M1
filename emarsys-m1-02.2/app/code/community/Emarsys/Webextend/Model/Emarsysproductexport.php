@@ -162,7 +162,10 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
                     }
 
                     foreach ($item['data'] as $key => $value) {
-                        if ($this->_mapHeader[$map[$key]] == 'price_' . $item['currency_code'] || $this->_mapHeader[$map[$key]] == 'msrp_' . $item['currency_code']) {
+                        if (isset($this->_mapHeader[$map[$key]]) &&
+                            ($this->_mapHeader[$map[$key]] == 'price_' . $item['currency_code']
+                                || $this->_mapHeader[$map[$key]] == 'msrp_' . $item['currency_code']
+                        )) {
                             $value = Mage::app()->getStore($item['store_id'])->getBaseCurrency()->convert($value, $item['currency_code']);
                         }
                         $this->_prepearedData[$productId][$map[$key]] = $value;
