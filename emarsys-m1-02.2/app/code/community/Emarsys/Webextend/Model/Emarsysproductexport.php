@@ -124,6 +124,8 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
     /**
      * Prepare Data for CSV
      *
+     * @throws Exception
+     * @throws Mage_Core_Model_Store_Exception
      * @return array
      */
     protected function _prepareData()
@@ -193,10 +195,11 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
     {
         if (!array_key_exists($storeCode, $this->_processedStores)) {
             // $this->_processedStores[$storeCode] = array(oldKey => newKey);
+            $this->_processedStores[$storeCode] = array();
             foreach ($header as $key => &$value) {
                 if (strtolower($value) == 'item') {
                     unset($header[$key]);
-                    $this->_processedStores[$storeCode] = array($key => 0);
+                    $this->_processedStores[$storeCode][$key] = 0;
                     continue;
                 }
 
