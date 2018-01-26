@@ -230,7 +230,13 @@ class Emarsys_Webextend_Model_Observer
 
                 $productExportModel->truncateTable();
 
+                $defaultStoreID = false;
+
                 foreach ($website as $storeId => $store) {
+                    $currencyStoreCode = $store['store']->getDefaultCurrencyCode();
+                    if (!$defaultStoreID) {
+                        $defaultStoreID = $store['store']->getWebsite()->getDefaultStore()->getId();
+                    }
                     $currentPageNumber = 1;
                     $collection = $productExportModel->getCatalogExportProductCollection(
                         $storeId,
@@ -256,9 +262,12 @@ class Emarsys_Webextend_Model_Observer
                             $products[$product->getId()] = array(
                                 'entity_id' => $product->getId(),
                                 'params' => serialize(array(
+                                    'default_store' => ($storeId == $defaultStoreID) ? $storeId : 0,
                                     'store' => $store['store']->getCode(),
+                                    'store_id' => $store['store']->getId(),
                                     'data' => Mage::helper('webextend')->attributeData($store['mapped_attributes_names'], $product, $categoryNames),
-                                    'header' => $header
+                                    'header' => $header,
+                                    'currency_code' => $currencyStoreCode,
                                 ))
                             );
                         }

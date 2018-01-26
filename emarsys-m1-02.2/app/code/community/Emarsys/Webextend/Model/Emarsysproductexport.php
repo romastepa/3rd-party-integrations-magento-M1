@@ -146,7 +146,12 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
                 $productData = explode($this::EMARSYS_DELIMITER, $product->getParams());
                 foreach ($productData as $param) {
                     $item = unserialize($param);
-                    $map = $this->prepareHeader($item['store'], $item['header']);
+                    $map = $this->prepareHeader(
+                        $item['store'],
+                        $item['header'],
+                        $item['default_store'],
+                        $item['currency_code']
+                    );
 
                     if (!isset($this->_prepearedData[$productId])) {
                         $this->_prepearedData[$productId] = array_fill(0, count($this->_mapHeader), "");
@@ -157,6 +162,9 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
                     }
 
                     foreach ($item['data'] as $key => $value) {
+                        if ($this->_mapHeader[$map[$key]] == 'price_' . $item['currency_code'] || $this->_mapHeader[$map[$key]] == 'msrp_' . $item['currency_code']) {
+                            $value = Mage::app()->getStore($item['store_id'])->getBaseCurrency()->convert($value, $item['currency_code']);
+                        }
                         $this->_prepearedData[$productId][$map[$key]] = $value;
                     }
                 }
@@ -172,11 +180,13 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
     /**
      * Prepare Global Header and Mapping
      *
-     * @param $storeCode
-     * @param $header
+     * @param string $storeCode
+     * @param array $header
+     * @param bool $isDefault
+     * @param string $currencyCode
      * @return mixed
      */
-    public function prepareHeader($storeCode, $header)
+    public function prepareHeader($storeCode, $header, $isDefault = false, $currencyCode)
     {
         if (!array_key_exists($storeCode, $this->_processedStores)) {
             // $this->_processedStores[$storeCode] = array(oldKey => newKey);
@@ -186,7 +196,22 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
                     $this->_processedStores[$storeCode] = array($key => 0);
                     continue;
                 }
-                $value = $value . '_' . $storeCode;
+
+                if (!$isDefault) {
+                    if (strtolower($value) == 'price' || strtolower($value) == 'msrp') {
+                        $newValue = $value . '_' . $currencyCode;
+                        $existingKey = array_search($newValue, $this->_mapHeader);
+                        if ($existingKey) {
+                            unset($header[$key]);
+                            $this->_processedStores[$storeCode][$key] = $existingKey;
+                            continue;
+                        } else {
+                            $value = $newValue;
+                        }
+                    } else {
+                        $value = $value . '_' . $storeCode;
+                    }
+                }
             }
             $headers = array_flip($header);
 
