@@ -312,7 +312,7 @@ class Emarsys_Suite2email_Adminhtml_Suite2email_PlaceholdersController extends M
             $emailText = $template->getTemplateText();
             while ($variable = Mage::helper('suite2email')->substringBetween($emailText)) {
                 $emailText = str_replace($variable, '', $emailText);
-                $emarsysVariable = Mage::helper('suite2email')->getPlacheloderName($variable);
+                $emarsysVariable = Mage::helper('suite2email')->getPlaceholderName($variable);
                 if (!empty($emarsysVariable)) {
                     $placeholderModel = Mage::getModel('suite2email/emarsysplaceholdermapping');
                     $collection = $placeholderModel->getCollection()

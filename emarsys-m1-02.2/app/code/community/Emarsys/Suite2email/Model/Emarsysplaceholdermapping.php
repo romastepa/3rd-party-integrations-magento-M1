@@ -51,7 +51,7 @@ class Emarsys_Suite2email_Model_Emarsysplaceholdermapping extends Mage_Core_Mode
             $i = 0;
             while ($variable = Mage::helper('suite2email')->substringBetween($emailText)) {
                 $emailText = str_replace($variable, '', $emailText);
-                $emarsysVariable = Mage::helper('suite2email')->getPlacheloderName($variable);
+                $emarsysVariable = Mage::helper('suite2email')->getPlaceholderName($variable);
                 if (!empty($emarsysVariable)) {
                     $array[$i]["event_mapping_id"] = $mapping_id;
                     $array[$i]["magento_placeholder_name"] = $variable;
