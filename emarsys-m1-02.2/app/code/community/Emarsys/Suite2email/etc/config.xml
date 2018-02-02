@@ -10,7 +10,7 @@
 <config>
     <modules>
         <Emarsys_Suite2email>
-            <version>0.2.2</version>
+            <version>0.2.3</version>
         </Emarsys_Suite2email>
     </modules>
     <admin>

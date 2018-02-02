@@ -28,7 +28,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
             if (!$collection->getSize()) {
                 $this->importEmarsysAttributes($storeId);
             }
-            $staticExportArray = Mage::helper('webextend')->getstaticExportArray();
+            $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
             $productAttrs = Mage::getResourceModel('catalog/product_attribute_collection');
             foreach ($productAttrs as $productAttr) {
                 /** @var Mage_Catalog_Model_Resource_Eav_Attribute $productAttr */
@@ -98,7 +98,9 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
         for ($i = 0; $i < count($array); $i++) {
             $model = Mage::getModel('webextend/emarsysproductattributes');
             $attributeCode = $array[$i];
-            $model->setAttributeCode($attributeCode);
+            $model->setAttributeCode(
+                str_replace(' ', '_', strtolower(trim($attributeCode)))
+            );
             $model->setAttributeLabel($attributeCode);
             $model->setStoreId($storeId);
             $model->save();
@@ -145,7 +147,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
         $collection->addFieldToFilter("id", $emarsysFieldId);
         $collection->addFieldToFilter("store_id", $storeId);
         $item = $collection->getFirstItem();
-        return $item->getAttributeLabel();
+        return $item->getAttributeCode();
     }
 
     /**

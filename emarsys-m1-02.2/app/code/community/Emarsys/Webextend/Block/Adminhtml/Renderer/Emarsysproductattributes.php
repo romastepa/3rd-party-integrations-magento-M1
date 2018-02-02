@@ -16,8 +16,8 @@ class Emarsys_Webextend_Block_Adminhtml_Renderer_Emarsysproductattributes extend
     public function render(Varien_Object $row)
     {
         try {
-            $staticExportArray = Mage::helper('webextend')->getstaticExportArray();
-            $staticExportMagentoArray = Mage::helper('webextend')->getstaticMagentoAttributeArray();
+            $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
+            $staticExportMagentoArray = Mage::helper('webextend')->getStaticMagentoAttributeArray();
 
             $storeId = $this->getRequest()->getParam('store');
             $url = $this->getUrl('*/*/changeValue');
@@ -38,10 +38,10 @@ class Emarsys_Webextend_Block_Adminhtml_Renderer_Emarsysproductattributes extend
                     $sel .= 'selected = selected';
                 }
                 $disabled = '';
-                if (in_array($obj->getData('attribute_code'), $staticExportArray)) {
+                if (in_array($obj->getData('attribute_label'), $staticExportArray)) {
                     $disabled = "disabled";
                 }
-                $html .= '<option ' . $sel . ' value="' . $obj->getData('id') . '" ' . $disabled . '>' . $obj->getData('attribute_code') . '</option>';
+                $html .= '<option ' . $sel . ' value="' . $obj->getData('id') . '" ' . $disabled . '>' . $obj->getData('attribute_label') . '</option>';
             }
             $html .= '</select>';
             return $html;

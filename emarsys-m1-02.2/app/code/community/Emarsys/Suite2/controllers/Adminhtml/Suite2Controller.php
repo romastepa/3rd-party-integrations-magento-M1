@@ -206,6 +206,15 @@ class Emarsys_Suite2_Adminhtml_Suite2Controller extends Mage_Adminhtml_Controlle
             printf("Error: {$e->getMessage()}");
         }
     }
+
+    public function exportFullCatalogAction()
+    {
+        try {
+            Mage::getModel('webextend/observer')->consolidatedCatalogExport();
+        } catch (Exception $e) {
+            printf("Error: {$e->getMessage()}");
+        }
+    }
     
     /**
      * Batch queueing

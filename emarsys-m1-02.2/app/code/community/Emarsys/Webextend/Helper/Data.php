@@ -8,8 +8,8 @@
  */
 class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
 {
-    const XML_PATH_AJAX_UPDATE_ENABLED   = 'webextendsection/webextendoptions/ajaxupdate';
-    const XML_PATH_USE_JQUERY_ENABLED   = 'webextendsection/webextendoptions/usejquery';
+    const XML_PATH_AJAX_UPDATE_ENABLED = 'webextendsection/webextendoptions/ajaxupdate';
+    const XML_PATH_USE_JQUERY_ENABLED = 'webextendsection/webextendoptions/usejquery';
 
     /**
      * Static Array of Required Emarsys attribute Fields
@@ -25,9 +25,9 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
      * get Static Export Array for Emarsys
      * @return array
      */
-    public function getstaticExportArray()
+    public function getStaticExportArray()
     {
-        $staticExportArray = array("Item", "Available", "Title", "Link", "Image", "Category", "Price");
+        $staticExportArray = array("item", "available", "title", "link", "image", "category", "price");
         return $staticExportArray;
     }
 
@@ -35,7 +35,7 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
      * get Static Export Array for Magento
      * @return array
      */
-    public function getstaticMagentoAttributeArray()
+    public function getStaticMagentoAttributeArray()
     {
         $staticMagentoAttributeArray = array("sku", "is_saleable", "name", "url_key", "image", "category_ids", "price");
         return $staticMagentoAttributeArray;
@@ -43,15 +43,15 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Moving File to FTP
-     * @param $websiteId
+     * @param $storeId
      * @param $outputFile
      * @param $ftpConnection
      * @param $filePath
      */
-    public function moveToFTP($websiteId, $outputFile, $ftpConnection, $filePath)
+    public function moveToFTP($storeId, $outputFile, $ftpConnection, $filePath)
     {
-        $bulkDir = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/dir', $websiteId);
-        $passiveMode = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/passive', $websiteId);
+        $bulkDir = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/dir', $storeId);
+        $passiveMode = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/passive', $storeId);
 
         $remoteDirPath = $bulkDir;
         if ($remoteDirPath == '/') {
