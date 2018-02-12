@@ -9,6 +9,8 @@
 
 <?php if ($cartData = $this->getCartItemsJsonData()): ?>
     <script>ScarabQueue.push(["cart", [<?php echo $cartData; ?>]]);</script>
+<?php else: ?>
+    <script>ScarabQueue.push(["cart", []]);</script>
 <?php endif; ?>
 
 <?php if ($extraData = $this->getAdditionalWebExtendCommands()): ?>
