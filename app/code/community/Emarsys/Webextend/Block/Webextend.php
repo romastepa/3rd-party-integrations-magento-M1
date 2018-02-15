@@ -134,7 +134,9 @@ class Emarsys_Webextend_Block_Webextend extends Mage_Core_Block_Template
                             $pathIndex++;
                             continue;
                         }
-                        $childCat = Mage::getModel('catalog/category')->load($categoryPathId);
+                        $childCat = Mage::getModel('catalog/category')
+                            ->setStoreId(Mage::app()->getWebsite()->getDefaultStore()->getId())
+                            ->load($categoryPathId);
                         $childCats[] = addslashes($childCat->getName());
                     }
                     $categoryName = implode(" > ", $childCats);
