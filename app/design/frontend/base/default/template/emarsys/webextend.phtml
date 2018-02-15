@@ -1,4 +1,6 @@
 <?php
+/** @var Emarsys_Webextend_Block_Webextend $this */
+
 $merchantId = $this->getMerchantId();
 $webExtendStatus = $this->getWebExtendEnabled();
 ?>
@@ -20,12 +22,14 @@ $webExtendStatus = $this->getWebExtendEnabled();
         <script>ScarabQueue.push(['testMode']);</script>
     <?php endif;?>
 
-    <?php if ($this->getCurrentCategory() != ''): ?>
-        <script>ScarabQueue.push(['category', '<?php echo $this->getCurrentCategory();?>']);</script>
+    <?php $currentCategory = $this->getCurrentCategory(); ?>
+    <?php if ($currentCategory != ''): ?>
+        <script>ScarabQueue.push(['category', '<?php echo $currentCategory; ?>']);</script>
     <?php endif; ?>
 
-    <?php if ($this->getCurrentProductSku() != ''): ?>
-        <script>ScarabQueue.push(['view', '<?php echo $this->getCurrentProductSku();?>']);</script>
+    <?php $currentProductSku = $this->getCurrentProductSku(); ?>
+    <?php if ($currentProductSku != ''): ?>
+        <script>ScarabQueue.push(['view', '<?php echo $currentProductSku; ?>']);</script>
     <?php endif; ?>
 
     <?php if ($this->getSearchResult() != ''): ?>
