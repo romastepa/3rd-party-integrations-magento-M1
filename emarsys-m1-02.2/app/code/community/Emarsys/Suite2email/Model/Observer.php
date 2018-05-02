@@ -35,14 +35,6 @@ class Emarsys_Suite2email_Model_Observer extends Emarsys_Suite2_Model_Observer
             if (in_array($order->getStatus(), Mage::helper('suite2email')->getOrderStatuses($websiteCode))) {
                 Mage::getModel('emarsys_suite2/queue')->addEntity($order);
             }
-            if (($customerId = $order->getCustomerId()) &&
-                ($customer = Mage::getModel('customer/customer')->load($customerId)) &&
-                ($customer->getId())
-            ) {
-                // add customer to observer and forward event further to customerSaveAfter
-                $observer->setCustomer($customer);
-                $this->customerSaveAfter($observer);
-            }
             Varien_Profiler::stop('EmarsysSuite2::orderSaveAfter');
         } catch (Exception $e) {
             Mage::helper('emarsys_suite2')->log($e->getMessage(), $this);
