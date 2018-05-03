@@ -8,7 +8,7 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
 {
     CONST EMARSYS_DELIMITER = '{EMARSYS}';
 
-    protected $_prepearedData = array();
+    protected $_preparedData = array();
 
     protected $_mapHeader = array('item');
 
@@ -96,6 +96,8 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
      */
     public function saveToCsv($websiteId)
     {
+        $this->_mapHeader = array('item');
+        $this->_preparedData = array();
         $this->_prepareData();
 
         $io = new Varien_Io_File();
@@ -110,7 +112,13 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
         $io->streamLock(true);
         $io->streamWriteCsv($this->_mapHeader);
 
-        foreach ($this->_prepearedData as $item) {
+        $columnCount = count($this->_mapHeader);
+        $emptyArray = array_fill(0, $columnCount, "");
+
+        foreach ($this->_preparedData as &$item) {
+            if (count($item) < $columnCount) {
+                $item = $item + $emptyArray;
+            }
             $io->streamWriteCsv(Mage::helper("core")->getEscapedCSVData($item));
         }
 
@@ -118,7 +126,6 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
         $io->streamClose();
 
         return array($file, $name);
-
     }
 
     /**
@@ -155,12 +162,12 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
                         $item['currency_code']
                     );
 
-                    if (!isset($this->_prepearedData[$productId])) {
-                        $this->_prepearedData[$productId] = array_fill(0, count($this->_mapHeader), "");
+                    if (!isset($this->_preparedData[$productId])) {
+                        $this->_preparedData[$productId] = array_fill(0, count($this->_mapHeader), "");
                     } else {
-                        $processed = $this->_prepearedData[$productId];
-                        $this->_prepearedData[$productId] = array_fill(0, count($this->_mapHeader), "");
-                        $this->_prepearedData[$productId] = $processed + $this->_prepearedData[$productId];
+                        $processed = $this->_preparedData[$productId];
+                        $this->_preparedData[$productId] = array_fill(0, count($this->_mapHeader), "");
+                        $this->_preparedData[$productId] = $processed + $this->_preparedData[$productId];
                     }
 
                     foreach ($item['data'] as $key => $value) {
@@ -170,16 +177,16 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
                         )) {
                             $value = Mage::app()->getStore($item['store_id'])->getBaseCurrency()->convert($value, $item['currency_code']);
                         }
-                        $this->_prepearedData[$productId][$map[$key]] = $value;
+                        $this->_preparedData[$productId][$map[$key]] = $value;
                     }
                 }
-                ksort($this->_prepearedData[$productId]);
+                ksort($this->_preparedData[$productId]);
             }
 
             $currentPageNumber++;
         }
 
-        return $this->_prepearedData;
+        return $this->_preparedData;
     }
 
     /**
