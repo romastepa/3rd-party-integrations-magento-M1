@@ -3,7 +3,7 @@
     <name>Emarsys_m1</name>
     <version>0.2.3</version>
     <stability>stable</stability>
-    <license uri="http://www.emarsys.com/en/terms-conditions">Emarsys Terms &amp; Conditions</license>
+    <license>MIT</license>
     <channel>community</channel>
     <extends/>
     <summary>A turnkey solution to plug your Emarsys Emarketing Suite directly into your Magento shop.</summary>
