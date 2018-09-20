@@ -190,18 +190,11 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
                 'inner',
                 $store->getId()
             );
-            $productCollection = $productCollection->addAttributeToFilter('visibility', array("neq" => 1));
 
             //Added collection filter of type ID
             if ($exportProductTypes != "") {
                 $explode = explode(",", $exportProductTypes);
                 $productCollection->addAttributeToFilter('type_id', array('in' => $explode));
-            }
-            //Added status filter
-            if ($exportProductStatus == 1) {
-                $productCollection->addAttributeToFilter('status', array('in' => array(1, 2)));
-            } else {
-                $productCollection->addAttributeToFilter('status', array('eq' => 1));
             }
             return $productCollection;
         } catch (Exception $e) {
