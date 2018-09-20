@@ -187,10 +187,13 @@ class Emarsys_Suite2_Adminhtml_Suite2Controller extends Mage_Adminhtml_Controlle
                 $result = true;
             }
 
+            $subscribedCustomer = Mage::getResourceModel('customer/customer_collection')
+                    ->joinField('subscriber_id', 'newsletter/subscriber', 'subscriber_id', 'customer_id = entity_id');
+            $subscribedCustomer->getSelect()->group('e.entity_id');
+
             $pageNum = 0;
             while ($this->_queueCollectionBatch(
-                Mage::getResourceModel('customer/customer_collection')
-                    ->joinField('subscriber_id', 'newsletter/subscriber', 'subscriber_id', 'customer_id = entity_id'),
+                $subscribedCustomer,
                 $pageNum++
             )) {
                 $result = true;
