@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+<!--
+/**
+ *
+ * @category   Suite2email
+ * @package    Emarsys_Suite2email
+ * @copyright  Copyright (c) 2016 Kensium Solution Pvt.Ltd. (http://www.kensiumsolutions.com/)
+ */
+-->
+<config>
+    <modules>
+        <Emarsys_Suite2email>
+            <version>0.2.3</version>
+        </Emarsys_Suite2email>
+    </modules>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Emarsys_Suite2email before="Emarsys_Suite2_Adminhtml">Emarsys_Suite2email_Adminhtml</Emarsys_Suite2email>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+    <global>
+        <blocks>
+            <suite2email>
+                <class>Emarsys_Suite2email_Block</class>
+            </suite2email>
+        </blocks>
+        <helpers>
+            <suite2email>
+                <class>Emarsys_Suite2email_Helper</class>
+            </suite2email>
+        </helpers>
+        <models>
+            <suite2email>
+                <class>Emarsys_Suite2email_Model</class>
+                <resourceModel>suite2email_mysql4</resourceModel>
+            </suite2email>
+            <suite2email_mysql4>
+                <class>Emarsys_Suite2email_Model_Mysql4</class>
+                <entities>
+                    <emarsysmagentoevents>
+                        <table>emarsys_magento_events</table>
+                    </emarsysmagentoevents>
+                    <emarsysevents>
+                        <table>emarsys_events</table>
+                    </emarsysevents>
+                    <emarsyseventsmapping>
+                        <table>emarsys_event_mapping</table>
+                    </emarsyseventsmapping>
+                    <emarsysplaceholdermapping>
+                        <table>emarsys_placeholders_mapping</table>
+                    </emarsysplaceholdermapping>
+                </entities>
+            </suite2email_mysql4>
+            <emarsys_suite2>
+                <rewrite>
+                    <observer>Emarsys_Suite2email_Model_Observer</observer>
+                </rewrite>
+            </emarsys_suite2>
+            <core>
+                <rewrite>
+                    <email_template>Emarsys_Suite2email_Model_Email_Template</email_template>
+                </rewrite>
+            </core>
+        </models>
+        <!-- setup of database -->
+        <resources>
+            <emarsys_suite2email_setup>
+                <setup>
+                    <module>Emarsys_Suite2email</module>
+                </setup>
+            </emarsys_suite2email_setup>
+            <emarsys_suite2email_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </emarsys_suite2email_write>
+            <emarsys_suite2email_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </emarsys_suite2email_read>
+        </resources>
+    </global>
+    <!-- Frontend Layout -->
+    <adminhtml>
+        <layout>
+            <updates>
+                <suite2email>
+                    <file>emarsys.xml</file>
+                </suite2email>
+            </updates>
+        </layout>
+        <menu>
+            <suite2email module="suite2email">
+                <title>Emarsys Email</title>
+                <sort_order>80</sort_order>
+                <children>
+                    <magentoevents module="suite2email">
+                        <title>Magento Events</title>
+                        <sort_order>0</sort_order>
+                        <action>adminhtml/suite2email_magentoevents</action>
+                    </magentoevents>
+                    <emarsysevents module="suite2email">
+                        <title>Emarsys Events</title>
+                        <sort_order>1</sort_order>
+                        <action>adminhtml/suite2email_emarsysevents</action>
+                    </emarsysevents>
+                    <mappingitems module="suite2email">
+                        <title>Emarsys Event Mapping</title>
+                        <sort_order>2</sort_order>
+                        <action>adminhtml/suite2email_eventmapping</action>
+                    </mappingitems>
+                </children>
+            </suite2email>
+        </menu>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <suite2email module="suite2email">
+                            <title>Emarsys Email</title>
+                            <sort_order>80</sort_order>
+                            <children>
+                                <magentoevents translate="title" module="suite2email">
+                                    <title>Magento Events</title>
+                                    <sort_order>0</sort_order>
+                                </magentoevents>
+                                <emarsysevents translate="title" module="suite2email">
+                                    <title>Emarsys Events</title>
+                                    <sort_order>1</sort_order>
+                                </emarsysevents>
+                                <mappingitems translate="title" module="suite2email">
+                                    <title>Emarsys Event Mapping</title>
+                                    <sort_order>2</sort_order>
+                                </mappingitems>
+                            </children>
+                        </suite2email>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+    </adminhtml>
+    <frontend>
+        <routers>
+            <suite2email>
+                <use>standard</use>
+                <args>
+                    <module>Emarsys_Suite2email</module>
+                    <frontName>suite2email</frontName>
+                </args>
+            </suite2email>
+        </routers>
+        <layout>
+            <updates>
+                <suite2email>
+                    <file>emarsys.xml</file>
+                </suite2email>
+            </updates>
+        </layout>
+    </frontend>
+    <crontab>
+        <jobs>
+            <check_emarsys_events>
+                <schedule><cron_expr>0 1 * * *</cron_expr></schedule>
+                <run><model>suite2email/observer::checkEmarsysEvents</model></run>
+            </check_emarsys_events>
+        </jobs>
+    </crontab>
+    <default>
+        <emarsys_suite2_smartinsight>
+            <statuses_selection>
+                <order_export_status>processing,complete,closed</order_export_status>
+            </statuses_selection>
+        </emarsys_suite2_smartinsight>
+    </default>
+</config>
