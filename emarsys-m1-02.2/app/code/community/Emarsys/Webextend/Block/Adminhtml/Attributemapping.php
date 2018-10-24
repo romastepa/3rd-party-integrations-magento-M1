@@ -14,8 +14,6 @@ class Emarsys_Webextend_Block_Adminhtml_Attributemapping extends Mage_Adminhtml_
     public function __construct()
     {
         try {
-            Mage::getModel('webextend/observer')->consolidatedCatalogExport();
-
             $this->_controller = 'adminhtml_attributemapping';
             $this->_blockGroup = 'webextend';
             $this->_headerText = Mage::helper('suite2email')->__('Magento Emarsys Product Attribute Mapping');
