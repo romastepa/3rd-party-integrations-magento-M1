@@ -61,7 +61,7 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
             $remoteFileName = $remoteDirPath . "/" . $outputFile;
         }
 
-        if (!$client->write($remoteFileName, $filePath)) {
+        if (!$client->write($remoteFileName, file_get_contents($filePath))) {
             $error = error_get_last();
             Mage::helper('emarsys_suite2')->log($error['message'], $this);
         }
