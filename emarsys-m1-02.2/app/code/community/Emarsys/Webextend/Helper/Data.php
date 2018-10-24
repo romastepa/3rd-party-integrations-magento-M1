@@ -113,7 +113,7 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
                         $attributeData[] = $productData->getProductUrl();
                     } elseif ($attributeName == 'is_saleable') {
                         if ($productData->isSaleable()
-                            && $productData->isInStock()
+                            && $productData->getInventoryInStock()
                             && $productData->getVisibility() != Mage_Catalog_Model_Product_Visibility::VISIBILITY_NOT_VISIBLE
                         ) {
                             $attributeData[] = 'TRUE';

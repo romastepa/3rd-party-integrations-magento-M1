@@ -36,12 +36,22 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
             $exportProductStatus = Mage::getStoreConfig("catalogexport/configurable_cron/webextenproductstatus", $storeId);
             $exportProductTypes = Mage::getStoreConfig("catalogexport/configurable_cron/webextenproductoptions", $storeId);
 
+            /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
             $collection = Mage::getModel('catalog/product')->getCollection();
             $collection->setPageSize($pageSize)
                 ->setCurPage($currentPageNumber)
                 ->addStoreFilter($storeId)
                 ->addAttributeToSelect($attributes)
                 ->addAttributeToSelect('visibility');
+
+            $collection->joinField(
+                'inventory_in_stock',
+                'cataloginventory/stock_item',
+                'is_in_stock',
+                'product_id=entity_id',
+                null,
+                'left'
+            );
 
             //Added collection filter of type ID
             if ($exportProductTypes != "") {
