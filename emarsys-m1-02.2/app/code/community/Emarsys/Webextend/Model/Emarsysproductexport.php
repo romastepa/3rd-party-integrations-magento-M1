@@ -40,10 +40,8 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
             $collection->setPageSize($pageSize)
                 ->setCurPage($currentPageNumber)
                 ->addStoreFilter($storeId)
-                ->addAttributeToSelect($attributes);
-
-            Mage::getSingleton('catalog/product_status')->addVisibleFilterToCollection($collection);
-            Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($collection);
+                ->addAttributeToSelect($attributes)
+                ->addAttributeToSelect('visibility');
 
             //Added collection filter of type ID
             if ($exportProductTypes != "") {
