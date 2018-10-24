@@ -174,7 +174,7 @@ class Emarsys_Webextend_Model_Observer
     public function setCredentials($store)
     {
         $storeId = $store->getId();
-        if (!isset($this->_credentials[$store->getWebsiteId()][$storeId])) {
+        if (!isset($this->_credentials[$this->getWebsiteId($store)][$storeId])) {
             $fullCatalogExportEnabled = Mage::getStoreConfig("catalogexport/configurable_cron/fullcatalogexportenabled", $storeId);
             if ($fullCatalogExportEnabled) {
                 $hostname = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/host', $storeId);
