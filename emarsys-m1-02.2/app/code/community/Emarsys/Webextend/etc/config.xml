@@ -10,7 +10,7 @@
 <config>
     <modules>
         <Emarsys_Webextend>
-            <version>0.2.2</version>
+            <version>0.2.3</version>
         </Emarsys_Webextend>
     </modules>
     <admin>
@@ -49,6 +49,9 @@
                     <emarsysproductattributesmapping>
                         <table>emarsys_product_attributes_mapping</table>
                     </emarsysproductattributesmapping>
+                    <emarsysproductexport>
+                        <table>emarsys_product_export</table>
+                    </emarsysproductexport>
                 </entities>
             </webextend_mysql4>
         </models>
@@ -73,20 +76,20 @@
     <frontend>
         <events>
             <newsletter_subscriber_save_after>
-              <observers>
-                <emarsys_webexted_newsletter_subscriber_save_after>
-                  <class>Emarsys_Webextend_Model_Observer</class>
-                  <method>newSubscriberEmailAddress</method>
-                </emarsys_webexted_newsletter_subscriber_save_after>
-              </observers>
+                <observers>
+                    <emarsys_webexted_newsletter_subscriber_save_after>
+                        <class>Emarsys_Webextend_Model_Observer</class>
+                        <method>newSubscriberEmailAddress</method>
+                    </emarsys_webexted_newsletter_subscriber_save_after>
+                </observers>
             </newsletter_subscriber_save_after>
             <customer_register_success>
-              <observers>
-                <emarsys_webexted_customer_register_success>
-                  <class>Emarsys_Webextend_Model_Observer</class>
-                  <method>newCustomerEmailAddress</method>
-                </emarsys_webexted_customer_register_success>
-              </observers>
+                <observers>
+                    <emarsys_webexted_customer_register_success>
+                        <class>Emarsys_Webextend_Model_Observer</class>
+                        <method>newCustomerEmailAddress</method>
+                    </emarsys_webexted_customer_register_success>
+                </observers>
             </customer_register_success>
             <checkout_onepage_controller_success_action>
                 <observers>
@@ -145,9 +148,9 @@
                                         <webextendsection>
                                             <title>WebExtend</title>
                                         </webextendsection>
-                                        <catalogexport>
+                                        <vcatalogexport>
                                             <title>Full Catalog Export</title>
-                                        </catalogexport>
+                                        </vcatalogexport>
                                     </children>
                                 </config>
                             </children>
@@ -189,7 +192,7 @@
                     <cron_expr>0 1 * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>webextend/observer::catalogExport</model>
+                    <model>webextend/observer::consolidatedCatalogExport</model>
                 </run>
             </emarsys_suite2_cron_export_products>
         </jobs>
@@ -205,5 +208,10 @@
                 <tax_included>0</tax_included>
             </webextendoptions>
         </webextendsection>
+        <catalogexport>
+            <configurable_cron>
+                <type>1</type>
+            </configurable_cron>
+        </catalogexport>
     </default>
 </config>

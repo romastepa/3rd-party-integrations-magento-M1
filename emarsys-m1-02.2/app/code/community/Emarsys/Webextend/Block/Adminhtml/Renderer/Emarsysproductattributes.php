@@ -16,8 +16,8 @@ class Emarsys_Webextend_Block_Adminhtml_Renderer_Emarsysproductattributes extend
     public function render(Varien_Object $row)
     {
         try {
-            $staticExportArray = Mage::helper('webextend')->getstaticExportArray();
-            $staticExportMagentoArray = Mage::helper('webextend')->getstaticMagentoAttributeArray();
+            $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
+            $staticExportMagentoArray = Mage::helper('webextend')->getStaticMagentoAttributeArray();
 
             $storeId = $this->getRequest()->getParam('store');
             $url = $this->getUrl('*/*/changeValue');

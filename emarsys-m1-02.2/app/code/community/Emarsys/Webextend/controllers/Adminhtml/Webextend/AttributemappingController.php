@@ -193,13 +193,6 @@ class Emarsys_Webextend_Adminhtml_Webextend_AttributemappingController extends M
                     $model->setId($col_record->getData("id"));
                     $model->save();
                 }
-                if ($col_record->getData('magento_attribute_code') == "image") {
-                    $emarsysAttributeId = $this->getEmarsysAttributeIds($storeId, $array[10]);
-                    $model->setEmarsysAttributeCodeId($emarsysAttributeId);
-                    $model->setStoreId($storeId);
-                    $model->setId($col_record->getData("id"));
-                    $model->save();
-                }
             }
             $storeId = $session['storeId'];
             Mage::getSingleton("adminhtml/session")->addSuccess(Mage::helper("adminhtml")->__("Recommended Emarsys Attributes Mapping Created Successfully!"));

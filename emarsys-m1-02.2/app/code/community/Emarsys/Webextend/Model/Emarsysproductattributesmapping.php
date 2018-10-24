@@ -18,6 +18,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
 
     /**
      * Insert Attribute mapping first time
+     *
      * @param $storeId
      * @throws Exception
      */
@@ -28,26 +29,31 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
             if (!$collection->getSize()) {
                 $this->importEmarsysAttributes($storeId);
             }
-            $staticExportArray = Mage::helper('webextend')->getstaticExportArray();
+            $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
             $productAttrs = Mage::getResourceModel('catalog/product_attribute_collection');
             foreach ($productAttrs as $productAttr) {
                 /** @var Mage_Catalog_Model_Resource_Eav_Attribute $productAttr */
                 if ($productAttr->getData("frontend_label") != "") {
                     $emarsysCodeId = '';
-                    if ($productAttr->getData("attribute_code") == "sku")
+                    if ($productAttr->getData("attribute_code") == "sku") {
                         $emarsysCodeId = $this->getEmarsysFieldIdByName($storeId, $staticExportArray[0]);
+                    }
 
-                    if ($productAttr->getData("attribute_code") == "name")
+                    if ($productAttr->getData("attribute_code") == "name") {
                         $emarsysCodeId = $this->getEmarsysFieldIdByName($storeId, $staticExportArray[2]);
+                    }
 
-                    if ($productAttr->getData("attribute_code") == "url_key")
+                    if ($productAttr->getData("attribute_code") == "url_key") {
                         $emarsysCodeId = $this->getEmarsysFieldIdByName($storeId, $staticExportArray[3]);
+                    }
 
-                    if ($productAttr->getData("attribute_code") == "image")
+                    if ($productAttr->getData("attribute_code") == "image") {
                         $emarsysCodeId = $this->getEmarsysFieldIdByName($storeId, $staticExportArray[4]);
+                    }
 
-                    if ($productAttr->getData("attribute_code") == "price")
+                    if ($productAttr->getData("attribute_code") == "price") {
                         $emarsysCodeId = $this->getEmarsysFieldIdByName($storeId, $staticExportArray[6]);
+                    }
 
                     $model = Mage::getModel('webextend/emarsysproductattributesmapping');
                     if ($emarsysCodeId != "") {
@@ -65,6 +71,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
                     }
                 }
             }
+
             $emarsysCodeId = $this->getEmarsysFieldIdByName($storeId, $staticExportArray[5]);
             $model = Mage::getModel('webextend/emarsysproductattributesmapping');
             $model->setMagentoAttributeCode("category_ids");
@@ -80,7 +87,6 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
             $model->setEmarsysAttributeCodeId($emarsysCodeId);
             $model->setStoreId($storeId);
             $model->save();
-
         } catch (Exception $e) {
             Mage::helper('emarsys_suite2')->log($e->getMessage(), $this);
         }
@@ -88,6 +94,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
 
     /**
      * Import Emarsys default attribute first time for the respective store if not exists
+     *
      * @param $storeId
      * @throws Exception
      *
@@ -98,7 +105,9 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
         for ($i = 0; $i < count($array); $i++) {
             $model = Mage::getModel('webextend/emarsysproductattributes');
             $attributeCode = $array[$i];
-            $model->setAttributeCode($attributeCode);
+            $model->setAttributeCode(
+                str_replace(' ', '_', strtolower(trim($attributeCode)))
+            );
             $model->setAttributeLabel($attributeCode);
             $model->setStoreId($storeId);
             $model->save();
@@ -107,6 +116,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
 
     /**
      * Import New Magento Attributes into Mapping Table
+     *
      * @param $storeId
      */
     public function importNewAttributes($storeId)
@@ -134,6 +144,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
 
     /**
      * Get Emarsys Field names by Emarsys Id
+     *
      * @param $storeId
      * @param $emarsysFieldId
      * @return mixed
@@ -145,11 +156,12 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
         $collection->addFieldToFilter("id", $emarsysFieldId);
         $collection->addFieldToFilter("store_id", $storeId);
         $item = $collection->getFirstItem();
-        return $item->getAttributeLabel();
+        return $item->getAttributeCode();
     }
 
     /**
      * Get Emarsys Field Id by Emarsys Attribute Name
+     *
      * @param $storeId
      * @param $emarsysFieldName
      * @return mixed
@@ -166,6 +178,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
 
     /**
      * Get Catalog Product Export Collection
+     *
      * @param $store
      * @param $exportProductTypes
      * @param $exportProductStatus
@@ -188,18 +201,10 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
                 'inner',
                 $store->getId()
             );
-            $productCollection = $productCollection->addAttributeToFilter('visibility', array("neq" => 1));
-
             //Added collection filter of type ID
             if ($exportProductTypes != "") {
                 $explode = explode(",", $exportProductTypes);
-                $productCollection->addAttributeToFilter('type_id', array('in' => $explode));
-            }
-            //Added status filter
-            if ($exportProductStatus == 1) {
-                $productCollection->addAttributeToFilter('status', array('in' => array(1, 2)));
-            } else {
-                $productCollection->addAttributeToFilter('status', array('eq' => 1));
+                $productCollection->addAttributeToFilter('type_id', ['in' => $explode]);
             }
             return $productCollection;
         } catch (Exception $e) {

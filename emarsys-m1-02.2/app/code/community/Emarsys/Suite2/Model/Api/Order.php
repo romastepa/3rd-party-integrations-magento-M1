@@ -24,16 +24,18 @@ class Emarsys_Suite2_Model_Api_Order extends Emarsys_Suite2_Model_Api_Abstract
     {
         return $this->_getConfig()->isOrdersExportEnabled();
     }
-    
+
     /**
      * Tests FTP connection
-     * 
+     *
      * @param array $params
+     * @return int|string
      */
     public function testFtp($params)
     {
         $result = 0;
-        $client = new Varien_Io_Ftp();
+        $client = new Varien_Io_Sftp();
+        $params['username'] = $params['user'];
         $client->open($params);
         $filename = 'test.txt';
         if ($params['dir']) {
@@ -66,16 +68,13 @@ class Emarsys_Suite2_Model_Api_Order extends Emarsys_Suite2_Model_Api_Abstract
             return false;
         }
 
-        $client = new Varien_Io_Ftp();
+        $client = new Varien_Io_Sftp();
         $this->log('Starting upload of "' . $src . '"');
         $client->open(
             array(
-                'ssl' => $this->_getConfig()->getSmartinsightFtpSsl(),
                 'host' => $this->_getConfig()->getSmartinsightFtpHost(),
-                'user' => $this->_getConfig()->getSmartinsightFtpUser(),
+                'username' => $this->_getConfig()->getSmartinsightFtpUser(),
                 'password' => $this->_getConfig()->getSmartinsightFtpPassword(),
-                'ssl' => $this->_getConfig()->getSmartinsightFtpSsl(),
-                'passive' => $this->_getConfig()->getSmartinsightFtpPassive()
             )
         );
         if ($dir = $this->_getConfig()->getSmartinsightFtpDir()) {
@@ -83,7 +82,11 @@ class Emarsys_Suite2_Model_Api_Order extends Emarsys_Suite2_Model_Api_Abstract
         }
 
         $this->log('Uploading "' . $src . '"');
-        $result = $client->write($filename, $src);
+        $result = $client->write($filename, file_get_contents($src));
+        if (!$result) {
+            $error = error_get_last();
+            $this->log($error['message']);
+        }
         $client->close();
         $this->log('Uploaded "' . $src . '"');
         return $result;
