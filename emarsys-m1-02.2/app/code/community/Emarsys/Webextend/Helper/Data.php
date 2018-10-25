@@ -18,7 +18,7 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getStaticFieldArray()
     {
-        return ['item', 'title', 'link', 'image', 'category', 'price', 'msrp', 'available', 'brand', 'description', 'zoom_image'];
+        return array('item', 'title', 'link', 'image', 'category', 'price', 'msrp', 'available', 'brand', 'description', 'zoom_image');
     }
 
     /**
@@ -28,7 +28,7 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getStaticExportArray()
     {
-        return ["item", "available", "title", "link", "image", "category", "price"];
+        return array("item", "available", "title", "link", "image", "category", "price");
     }
 
     /**
@@ -38,7 +38,7 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getStaticMagentoAttributeArray()
     {
-        return ["sku", "is_saleable", "name", "url_key", "image", "category_ids", "price"];
+        return array("sku", "is_saleable", "name", "url_key", "image", "category_ids", "price");
     }
 
     /**
@@ -79,7 +79,7 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
     {
         try {
             //Get Product attributes
-            $attributeData = [];
+            $attributeData = array();
             foreach ($magentoAttributeNames as $attributeName) {
                 if ($attributeName != "category_ids") {
                     $attributeOption = trim($productData->getData($attributeName));

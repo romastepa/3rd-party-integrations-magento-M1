@@ -204,7 +204,7 @@ class Emarsys_Webextend_Model_Emarsysproductattributesmapping extends Mage_Core_
             //Added collection filter of type ID
             if ($exportProductTypes != "") {
                 $explode = explode(",", $exportProductTypes);
-                $productCollection->addAttributeToFilter('type_id', ['in' => $explode]);
+                $productCollection->addAttributeToFilter('type_id', array('in' => $explode));
             }
             return $productCollection;
         } catch (Exception $e) {

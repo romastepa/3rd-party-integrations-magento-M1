@@ -56,7 +56,8 @@ class Emarsys_Suite2_Model_Api extends Varien_Http_Client
      */
     protected function _getWSSEHeader()
     {
-        $nonce = md5(time());
+        //$nonce = md5(time());
+        $nonce = md5(uniqid('', true));
         $timestamp = gmdate("c");
         $passwordDigest = base64_encode(sha1($nonce . $timestamp . $this->_password, false));
         return sprintf(

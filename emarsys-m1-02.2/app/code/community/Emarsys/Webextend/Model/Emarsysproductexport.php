@@ -112,7 +112,7 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
 
         $io = new Varien_Io_File();
 
-        $path = Mage::getBaseDir('var') . DS . 'export';
+        $path = Mage::getBaseDir('var');
         $name = "products_" . $websiteId . ".csv";
         $file = $path . DS . $name;
 

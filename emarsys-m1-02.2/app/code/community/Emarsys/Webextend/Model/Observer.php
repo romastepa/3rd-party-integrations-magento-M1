@@ -8,8 +8,8 @@
  */
 class Emarsys_Webextend_Model_Observer
 {
-    protected $_credentials = [];
-    protected $_websites = [];
+    protected $_credentials = array();
+    protected $_websites = array();
 
     /**
      * Catalog Export Function which will call from Cron
@@ -84,7 +84,7 @@ class Emarsys_Webextend_Model_Observer
                 $this->setCredentials($store);
             }
             foreach ($this->getCredentials() as $websiteId => $website) {
-                $attributes = [];
+                $attributes = array();
                 foreach ($website as $store) {
                     $attributes = array_merge($attributes, $store['mapped_attributes_names']);
                 }
@@ -114,21 +114,21 @@ class Emarsys_Webextend_Model_Observer
                                 $attributes
                             );
                         }
-                        $products = [];
+                        $products = array();
                         foreach ($collection as $product) {
                             $catIds = $product->getCategoryIds();
                             $categoryNames = $this->getCategoryNames($catIds, $storeId);
-                            $products[$product->getId()] = [
+                            $products[$product->getId()] = array(
                                 'entity_id' => $product->getId(),
-                                'params' => serialize([
+                                'params' => serialize(array(
                                     'default_store' => ($storeId == $defaultStoreID) ? $storeId : 0,
                                     'store' => $store['store']->getCode(),
                                     'store_id' => $store['store']->getId(),
                                     'data' => Mage::helper('webextend')->attributeData($store['mapped_attributes_names'], $product, $categoryNames),
                                     'header' => $header,
                                     'currency_code' => $currencyStoreCode,
-                                ]),
-                            ];
+                                )),
+                            );
                         }
                         if (!empty($products)) {
                             $productExportModel->saveBulkProducts($products);
@@ -228,13 +228,13 @@ class Emarsys_Webextend_Model_Observer
     {
         $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
         $staticMagentoAttributeArray = Mage::helper('webextend')->getStaticMagentoAttributeArray();
-        $emarsysFieldNames = [];
-        $magentoAttributeNames = [];
+        $emarsysFieldNames = array();
+        $magentoAttributeNames = array();
         //Getting mapped emarsys attribute collection
         $model = Mage::getModel('webextend/emarsysproductattributesmapping');
         $collection = $model->getCollection();
         $collection->addFieldToFilter("store_id", $storeId);
-        $collection->addFieldToFilter("emarsys_attribute_code_id", ["neq" => 0]);
+        $collection->addFieldToFilter("emarsys_attribute_code_id", array("neq" => 0));
         if ($collection->getSize()) {
             //need to make sure required mapping fields should be there else we have to manually map.
             foreach ($collection as $col_record) {
@@ -270,12 +270,12 @@ class Emarsys_Webextend_Model_Observer
      */
     public function getCategoryNames($catIds, $storeId)
     {
-        $categoryNames = [];
+        $categoryNames = array();
         foreach ($catIds as $catId) {
             $cateData = Mage::getModel("catalog/category")->setStoreId($storeId)->load($catId);
             $categoryPath = $cateData->getPath();
             $categoryPathIds = explode('/', $categoryPath);
-            $childCats = [];
+            $childCats = array();
             if (count($categoryPathIds) > 2) {
                 $pathIndex = 0;
                 foreach ($categoryPathIds as $categoryPathId) {
