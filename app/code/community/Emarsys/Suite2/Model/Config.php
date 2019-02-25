@@ -114,16 +114,6 @@ class Emarsys_Suite2_Model_Config extends Varien_Object
         return Mage::getStoreConfig('emarsys_suite2_contacts_sync/field_mapping/optin_id', $this->_storeId);
     }
 
-
-    /**
-     * Return true if Key_id is Email
-     * @return mixed
-     */
-    public function isEmailKeyId()
-    {
-        return Mage::getStoreConfig('emarsys_suite2_contacts_sync/settings/email_as_id', $this->_storeId);
-    }
-    
     /**
      * Returns Emarsys Opt In field identifier
      * 

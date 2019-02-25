@@ -148,9 +148,12 @@ class Emarsys_Suite2_Model_Api extends Varien_Http_Client
     
     public function ping()
     {
-        $result = 1;
+        $result = 0;
         try {
             $response = $this->get('settings');
+            if ($response && isset($response['replyText']) && $response['replyText'] == 'OK') {
+                $result = 1;
+            }
         } catch (Zend_Http_Client_Exception $e) {
             $result = self::API_ERROR_CONNECTION;
         } catch (Exception $e) {

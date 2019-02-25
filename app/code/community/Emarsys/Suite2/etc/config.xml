@@ -205,7 +205,7 @@
                 <crontab>20 0 * * *</crontab>
                 <bundle_price_calculated>1</bundle_price_calculated>
                 <bundle_include>1</bundle_include>
-                <email_as_id>0</email_as_id>
+                <email_as_id>1</email_as_id>
                 <use_base_currency>0</use_base_currency>
             </settings>
         </emarsys_suite2_smartinsight>
