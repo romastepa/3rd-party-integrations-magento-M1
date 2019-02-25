@@ -95,6 +95,9 @@ class Emarsys_Webextend_Model_Observer
                 $defaultStoreID = false;
 
                 foreach ($website as $storeId => $store) {
+                    /** @var Mage_Core_Model_App_Emulation $appEmulation */
+                    $appEmulation = Mage::getSingleton('core/app_emulation');
+                    $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
                     $currencyStoreCode = $store['store']->getDefaultCurrencyCode();
                     if (!$defaultStoreID) {
                         $defaultStoreID = $store['store']->getWebsite()->getDefaultStore()->getId();
@@ -108,10 +111,6 @@ class Emarsys_Webextend_Model_Observer
 
                     $lastPageNumber = $collection->getLastPageNumber();
                     $header = $store['emarsys_field_names'];
-
-                    /** @var Mage_Core_Model_App_Emulation $appEmulation */
-                    $appEmulation = Mage::getSingleton('core/app_emulation');
-                    $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
                     while ($currentPageNumber <= $lastPageNumber) {
                         if ($currentPageNumber != 1) {
                             $collection = $productExportModel->getCatalogExportProductCollection(

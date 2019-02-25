@@ -32,7 +32,7 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
     {
         try {
             $storeId = Mage::app()->getStore($storeId)->getId();
-            $pageSize = Mage::helper('emarsys_suite2/adminhtml')->getBatchSize();
+            $pageSize = 500;
             $exportProductStatus = Mage::getStoreConfig("catalogexport/configurable_cron/webextenproductstatus", $storeId);
             $exportProductTypes = Mage::getStoreConfig("catalogexport/configurable_cron/webextenproductoptions", $storeId);
 
@@ -43,9 +43,6 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
                 ->addStoreFilter($storeId)
                 ->addFinalPrice()
                 ->addAttributeToSelect($attributes);
-
-            Mage::getSingleton('catalog/product_status')->addVisibleFilterToCollection($collection);
-            Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($collection);
 
             //Added collection filter of type ID
             if ($exportProductTypes != "") {
