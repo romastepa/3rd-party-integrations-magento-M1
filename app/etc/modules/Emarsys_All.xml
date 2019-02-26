@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Emarsys_Suite>
+            <active>false</active>
+            <codePool>community</codePool>
+            <depends>Mage_Api</depends>
+        </Emarsys_Suite>
+        <Emarsys_Suite2>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Emarsys_Suite2>
+        <Emarsys_Suite2email>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Emarsys_Suite2 />
+            </depends>
+        </Emarsys_Suite2email>
+        <Emarsys_Webextend>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Emarsys_Suite2 />
+            </depends>
+        </Emarsys_Webextend>
+    </modules>
+</config>
