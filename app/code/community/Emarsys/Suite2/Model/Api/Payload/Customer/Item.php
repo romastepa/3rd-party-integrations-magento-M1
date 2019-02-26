@@ -1,19 +1,20 @@
 <?php
+
 /**
  * API Customer Item
- * 
+ *
  * Created to generate correct toArray based on mapping
  */
 class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Model_Api_Payload_Abstract
 {
     protected $_idFieldName = 'customer_id';
-    protected $_addresses = array();
-    
+    protected $_addresses = [];
+
     protected function _getKeyId()
     {
         return $this->_getConfig()->getEmarsysCustomerKeyId();
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -22,12 +23,12 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
         /* @var $customer Mage_Customer_Model_Customer */
         $this->_getConfig()->setWebsite($customer->getWebsiteId());
         $mapping = $this->_getConfig()->getMapping();
-        if(isset($mapping['is_subscribed'])) {
+        if (isset($mapping['is_subscribed'])) {
             unset($mapping['is_subscribed']);
         }
         $mappedCountries = Mage::helper('emarsys_suite2/country')->getMapping();
         $data['customer_id'] = $customer->getId();
-        
+
         if ($customer->hasData('is_subscribed')) {
             $data['is_subscribed'] = $customer->getIsSubscribed();
         }
@@ -41,7 +42,7 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
             if (strpos($attributeCode, 'default_billing_') === 0) {
                 $addressAttributeCode = str_replace('default_billing_', '', $attributeCode);
                 if ($address = $this->_getAddress($customer, 'default_billing')) {
-                    $value = $address->getData($addressAttributeCode);
+                    $value = str_replace("\n", ", ", $address->getData($addressAttributeCode));
                     if ($addressAttributeCode == 'country_id') {
                         $value = (isset($mappedCountries[$value]) ? $mappedCountries[$value] : $value);
                     }
@@ -49,7 +50,7 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
             } elseif (strpos($attributeCode, 'default_shipping_') === 0) {
                 $addressAttributeCode = str_replace('default_shipping_', '', $attributeCode);
                 if ($address = $this->_getAddress($customer, 'default_shipping')) {
-                    $value = $address->getData($addressAttributeCode);
+                    $value = str_replace("\n", ", ", $address->getData($addressAttributeCode));
                     if ($addressAttributeCode == 'country_id') {
                         $value = (isset($mappedCountries[$value]) ? $mappedCountries[$value] : $value);
                     }
@@ -62,8 +63,7 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
                 if ($attribute = Mage::getSingleton('eav/config')->getAttribute('customer', $attributeCode)) {
                     if ($attribute->getFrontendInput() == 'date') {
                         $value = $this->_formatDate($value);
-                    }
-                    else if ($attribute->getFrontendInput() == 'datetime') {
+                    } elseif ($attribute->getFrontendInput() == 'datetime') {
                         $value = $this->_formatDatetime($value);
                     }
                 }
@@ -80,12 +80,12 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
         $data['created_at'] = $this->_formatDatetime($customer->getCreatedAtTimestamp());
         return parent::__construct($data);
     }
-    
+
     protected function _getAddress($customer, $type)
     {
         if (($type == 'default_billing') && ($address = $customer->getDefaultBillingAddress())) {
             return $address;
-        } else if (($type == 'default_shipping') && ($address = $customer->getDefaultShippingAddress())) {
+        } elseif (($type == 'default_shipping') && ($address = $customer->getDefaultShippingAddress())) {
             return $address;
         } else {
             // When customer was created in backend - this must be done to load address correctly.
@@ -102,17 +102,14 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
             return (isset($this->_addresses[$addressId]) ? $this->_addresses[$addressId] : null);
         }
     }
-    
+
     /**
      * @inheritdoc
      */
-    public function toArray(array $arrAttributes = array())
+    public function toArray(array $arrAttributes = [])
     {
-        
         $mapping = $this->_getConfig()->getMapping();
-        if(isset($mapping['is_subscribed'])) {
-            unset($mapping['is_subscribed']);
-        }
+
         $result[$this->_getKeyId()] = $this->getId();
         $data = $this->_data;
 
@@ -123,6 +120,15 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
 
         foreach ($mapping as $attributeCode => $emarsysId) {
             if (array_key_exists($attributeCode, $data)) {
+                if ($attributeCode == 'is_subscribed') {
+                    if ($data[$attributeCode] == 1) {
+                        $data[$attributeCode] = $this->_getConfig()->getEmarsysOptInTrue();
+                    } elseif ($data[$attributeCode] == 3) {
+                        $data[$attributeCode] = $this->_getConfig()->getEmarsysOptInFalse();
+                    } else {
+                        $data[$attributeCode] = '';
+                    }
+                }
                 $result[$emarsysId] = $data[$attributeCode];
             }
         }
@@ -133,9 +139,9 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
 
         // Add store code //
         $storeId = $this->getDataObject()->getStoreId()
-                ? $this->getDataObject()->getStoreId()
-                : Mage::app()->getWebsite($this->getDataObject()->getWebsiteId())->getDefaultStore()->getId();
-        
+            ? $this->getDataObject()->getStoreId()
+            : Mage::app()->getWebsite($this->getDataObject()->getWebsiteId())->getDefaultStore()->getId();
+
         if (isset($mapping['store_code'])) {
             $result[$mapping['store_code']] = Mage::app()->getStore($storeId)->getCode();
         }
@@ -144,10 +150,10 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
         if (isset($mapping['website_code'])) {
             $result[$mapping['website_code']] = Mage::app()->getStore($storeId)->getWebsite()->getCode();
         }
-        
+
         return $result;
     }
-    
+
     public function isSubscriberExists()
     {
         return ($this->getDataObject() && $this->getDataObject()->getData(Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection::EMARSYS_SUBSCRIBER_UPDATE_FLAG));
