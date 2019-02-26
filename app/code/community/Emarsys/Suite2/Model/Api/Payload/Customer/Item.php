@@ -97,6 +97,12 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item extends Emarsys_Suite2_Mode
                 }
 
                 $this->_addresses[$addressId] = $address;
+            } else {
+                $address = current($customer->getAddresses());
+                if ($address && is_object($address) && $address->getId() && !isset($this->_addresses[$address->getId()])) {
+                    $addressId = $address->getId();
+                    $this->_addresses[$address->getId()] = $address;
+                }
             }
 
             return (isset($this->_addresses[$addressId]) ? $this->_addresses[$addressId] : null);
