@@ -9,7 +9,7 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
     const ENTITY_TYPE_SUBSCRIBER = 1000;
     
     protected $_entityTypes = array();
-    protected $_batchSize = 1000;
+    protected $_batchSize = 500;
     protected $_page = 0;
     protected $_collection;
     protected $_mainEntity;
@@ -45,7 +45,7 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
      */
     public function setMainEntity($entity)
     {
-        $this->_getEnityTypeId($entity);
+        $this->_getEntityTypeId($entity);
         $this->_mainEntity = $entity;
         return $this;
     }
@@ -64,7 +64,7 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
      */
     public function addEntityTypeId($entity)
     {
-        $this->_getEnityTypeId($entity);
+        $this->_getEntityTypeId($entity);
     }
     
     /**
@@ -72,7 +72,7 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
      * 
      * @param mixed $entity
      */
-    protected function _getEnityTypeId($entity)
+    protected function _getEntityTypeId($entity)
     {
         if ($entity instanceof Mage_Newsletter_Model_Subscriber) {
             $entity->setEntityTypeId(self::ENTITY_TYPE_SUBSCRIBER);
@@ -91,29 +91,31 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
             }
         }
     }
-    
+
     /**
      * Adds collection to export queue
-     * 
+     *
      * @param mixed $collection
+     * @return Emarsys_Suite2_Model_Queue
      */
     public function addCollection($collection)
     {
         $this->getResource()->addCollection($collection);
         return $this;
     }
-    
+
     /**
      * adds entity to export queue
-     * 
+     *
      * @param mixed $entity
-     * 
-     * @return type
+     * @param null $extraData
+     * @return Mage_Core_Model_Abstract
+     * @throws Mage_Core_Model_Store_Exception
      */
     public function addEntity($entity, $extraData = null)
     {
         if (!$entity->getEntityTypeId()) {
-            $this->_getEnityTypeId($entity);
+            $this->_getEntityTypeId($entity);
         }
 
         if (!$entity->hasWebsiteId()) {
@@ -149,7 +151,7 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
     public function removeEntity($entity)
     {
         if (!$entity->getEntityTypeId()) {
-            $this->_getEnityTypeId($entity);
+            $this->_getEntityTypeId($entity);
         }
 
         // Try to find entity in loaded collection first //
@@ -176,17 +178,19 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
 
         return $this;
     }
-    
+
     /**
      * Gets entity list for provided entity
-     * 
+     *
      * @param mixed $entity
-     * 
-     * @return \Emarsys_Suite2_Model_Resource_Queue_Collection
+     *
+     * @return Emarsys_Suite2_Model_Resource_Queue_Collection
      */
     protected function _getEntityList($entity)
     {
-        $collection = $this->getCollection()->addFieldToFilter('entity_type_id', $entity->getEntityTypeId());
+        $collection = $this->getCollection()
+            ->addFieldToFilter('entity_type_id', $entity->getEntityTypeId());
+
         if ($this->getEntityIds() && is_array($this->getEntityIds())) {
             $collection->addFieldToFilter('entity_id', array('IN' => $this->getEntityIds()));
         }
@@ -200,12 +204,12 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
      * @param mixed $entity    Entity object
      * @param int   $websiteId Website identifier
      * 
-     * @return \Emarsys_Suite2_Model_Resource_Queue_Collection
+     * @return Emarsys_Suite2_Model_Resource_Queue_Collection
      */
     public function getEntityList($entity, $websiteId = 0)
     {
         if (!$entity->getEntityTypeId()) {
-            $this->_getEnityTypeId($entity);
+            $this->_getEntityTypeId($entity);
         }
 
         $collection = $this->_getEntityList($entity);
@@ -227,12 +231,12 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
     {
         $this->_page = 0;
     }
-    
+
     /**
      * Gets next bunch or false if nothing left
-     * 
+     *
      * @param type $entity
-     * @param type $websiteId
+     * @param int $websiteId
      * @param type $queue
      * @return Emarsys_Suite2_Model_Resource_Queue_Collection|boolean
      */
@@ -245,6 +249,9 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
         }
 
         $this->_collection = null;
-        return $this->getEntityList($entity, $websiteId)->setPageSize($this->_batchSize)->setCurPage(++$this->_page);
+
+        return $this->getEntityList($entity, $websiteId)
+            ->setPageSize($this->_batchSize)
+            ->setCurPage(++$this->_page);
     }    
 }

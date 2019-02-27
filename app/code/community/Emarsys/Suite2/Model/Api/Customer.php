@@ -75,26 +75,16 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
      */
     protected function _getCollection($ids)
     {
-        $logEnabled = is_object(Mage::getModel('log/customer'));
         // We need to join subscriber id to get the id of subscriber on a customer record
         $collection = Mage::getResourceModel('customer/customer_collection')
                 ->addAttributeToFilter('entity_id', array('in' => $ids))
                 ->addAttributeToSelect(array_keys($this->_getConfig()->getMapping()))
                 ->addAttributeToSelect(array('default_billing', 'default_shipping'))
-                ->joinTable(array('ns' => 'newsletter/subscriber'), 'customer_id = entity_id', array('subscriber_id', 'is_subscribed' => new Zend_Db_Expr('IF(subscriber_status = 1, 1, 0)')), null, 'left');
-        $salesData = Mage::helper('emarsys_suite2')->getCustomersOrdersData($ids);
-        foreach ($collection as $item) {
-            if (isset($salesData[$item->getEntityId()])) {
-                $item->addData($salesData[$item->getEntityId()]);
-            }
-
-            if ($this->getIsFullExport() && $logEnabled) {
-                $logCustomer = Mage::getModel('log/customer')->loadByCustomer($item->getId());
-                if ($logCustomer->hasLastVisitAt()) {
-                    $item->setData('c_last_login', $logCustomer->getLastVisitAt());
-                }
-            }
-        }
+                ->joinTable(
+                    array('ns' => 'newsletter/subscriber'), 'customer_id = entity_id', array('subscriber_id', 'is_subscribed' => 'subscriber_status', 'subscriber_status'),
+                    null,
+                    'left'
+                );
 
         return $collection;
     }
@@ -109,6 +99,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
     protected function _getPayload($queue)
     {
         $ids = $queue->getColumnValues('entity_id');
+        $ids = array_unique($ids);
         if ($ids) {
             $collection = $this->_getCollection($ids);
             if ($collection->getSize()) {
@@ -139,12 +130,12 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
      */
     protected function _exportWebsiteData($website)
     {
-        /* @var $config Emarsys_Suite2_Model_Config */
         if (!$this->isExportEnabled()) {
             return $this;
         }
 
         $queue = null;
+        /** @var Emarsys_Suite2_Model_Queue $queueInstance */
         $queueInstance = Mage::getModel('emarsys_suite2/queue');
         if ($this->getCustomerIds() && is_array($this->getCustomerIds())) {
             $queueInstance->setEntityIds($this->getCustomerIds());
@@ -157,6 +148,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
                 }
             } catch (Exception $e) {
                 $this->log('Got exception when iterating batch: ' . $e->getMessage());
+                Mage::logException($e);
             }
         } while ($queue);
         return $this;
@@ -240,14 +232,19 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
                 return true;
             }
         } catch (Exception $e) {
-            
+            Mage::logException($e);
         }
     }
+
     /**
-     * 
-     * @param type $email
-     * @param type $websiteId
-     * @param type $method
+     *
+     * @param string $email
+     * @param int $websiteId
+     * @param null $customerId
+     * @param null $subscriberId
+     * @return bool
+     * @throws Mage_Core_Exception
+     * @throws Mage_Core_Model_Store_Exception
      */
     public function exportEmail($email, $websiteId = 0, $customerId = null, $subscriberId = null)
     {
@@ -274,6 +271,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
             $this->getClient()->put('contact/create_if_not_exists=1', $data);
             return true;
         } catch (Exception $e) {
+            Mage::logException($e);
             return false;
         }
     }
