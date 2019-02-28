@@ -1,4 +1,5 @@
 <?php
+
 /**
  * API Customer Item collection
  *
@@ -9,29 +10,29 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
     const EMARSYS_CREATED_FLAG = '_exists_in_suite';
     const EMARSYS_SUBSCRIBER_UPDATE_FLAG = '_update_ex_subscriber';
     const EMARSYS_MAIL_CHANGE_FROM = '_mail_changed_from';
-    
+
     protected $_itemFactoryName = 'emarsys_suite2/api_payload_customer_item';
 
     protected $_hasMailChanges = false;
-    protected $_ids = array();
-    protected $_idsUpdate = array();
-    protected $_idsCreate = array();
-    protected $_emailsClean = array();
-    protected $_idsUpdateExistingSubscriber = array();
-    
+    protected $_ids = [];
+    protected $_idsUpdate = [];
+    protected $_idsCreate = [];
+    protected $_emailsClean = [];
+    protected $_idsUpdateExistingSubscriber = [];
+
     /**
      * @inheritdoc
      */
     public function clear()
     {
-        $this->_ids = array();
-        $this->_idsUpdate = array();
-        $this->_idsCreate = array();
-        $this->_emailsClean = array();
-        $this->_idsUpdateExistingSubscriber = array();
+        $this->_ids = [];
+        $this->_idsUpdate = [];
+        $this->_idsCreate = [];
+        $this->_emailsClean = [];
+        $this->_idsUpdateExistingSubscriber = [];
         parent::clear();
     }
-    
+
     /**
      * Returns key identifier
      *
@@ -70,15 +71,20 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
             $this->_emailsClean[] = $item->getDataObject()->getData(self::EMARSYS_MAIL_CHANGE_FROM);
         }
 
-        $this->_ids[] = $item->getId();
-        return parent::addItem($item);
+        try {
+            $this->_ids[] = $item->getId();
+            return parent::addItem($item);
+        } catch (Exception $e) {
+            return $this;
+        }
     }
 
     /**
      * Adds collection by item
      *
-     * @param Varien_Data_Collection                         $collection Collection
-     * @param Emarsys_Suite2_Model_Resource_Queue_Collection $queue      Queue if needed
+     * @param Varien_Data_Collection $collection Collection
+     * @param Emarsys_Suite2_Model_Resource_Queue_Collection $queue Queue if needed
+     * @return Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection
      */
     public function addCollection($collection, $queue = null)
     {
@@ -100,18 +106,18 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
     /**
      * @inheritdoc
      */
-    public function toArray($arrRequiredFields = array())
+    public function toArray($arrRequiredFields = [])
     {
-        $arrItems = array();
+        $arrItems = [];
         $arrItems['key_id'] = $this->_getKeyId();
-        $arrItems['contacts'] = array();
+        $arrItems['contacts'] = [];
         foreach ($this as $item) {
             $arrItems['contacts'][] = $item->toArray();
         }
 
         return $arrItems;
     }
-    
+
     protected function _checkIds($keyId, $ids)
     {
         Mage::log(Varien_Debug::backtrace(1), 1, 1, 1, 1);
@@ -119,10 +125,10 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
         $client = Mage::helper('emarsys_suite2')->getClient();
         return $client->post(
             'contact/checkids',
-            array(
+            [
                 'key_id' => $keyId,
-                'external_ids' => $ids
-            )
+                'external_ids' => $ids,
+            ]
         );
     }
 
@@ -133,15 +139,15 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
     {
         $config = Mage::getSingleton('emarsys_suite2/config');
         $client = Mage::helper('emarsys_suite2')->getClient();
-        
-        $items = $itemsToDelete = array();
+
+        $items = $itemsToDelete = [];
         if ($this->_emailsClean) {
             $response = $this->_checkIds($config->getEmarsysEmailKeyId(), $this->_emailsClean);
             foreach ($response['data']['ids'] as $email => $internalId) {
-                $payload = array(
+                $payload = [
                     'key_id' => $config->getEmarsysEmailKeyId(),
-                    $config->getEmarsysEmailKeyId() => $email
-                );
+                    $config->getEmarsysEmailKeyId() => $email,
+                ];
                 $client->post('contact/delete', $payload);
             }
         }
@@ -156,7 +162,7 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
     public function callCheckEmailIds()
     {
         $config = Mage::getSingleton('emarsys_suite2/config');
-        $items = array();
+        $items = [];
         foreach ($this->_items as $item) {
             $items[] = $item->getEmail();
             $item->setData(self::EMARSYS_CREATED_FLAG, false);
@@ -167,9 +173,9 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
             $item = $this->getItemByColumnValue('email', $email);
             if ($item) {
                 $this->_idsUpdate[$email] = $item
-                        ->setData(self::EMARSYS_CREATED_FLAG, true)
-                        ->getDataObject()
-                        ->getId();
+                    ->setData(self::EMARSYS_CREATED_FLAG, true)
+                    ->getDataObject()
+                    ->getId();
             }
         }
 
@@ -183,14 +189,14 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
      */
     public function getEmailPayload()
     {
-        $arrItems = array();
+        $arrItems = [];
         $arrItems['key_id'] = $this->_getConfig()->getEmarsysEmailKeyId();
-        $arrItems['contacts'] = array();
-        $this->_ids = array();
+        $arrItems['contacts'] = [];
+        $this->_ids = [];
         foreach ($this as $item) {
             $this->_ids[$item->getDataObject()->getId()] = $item->getDataObject()->getEmail();
             $arrItems['contacts'][] = $item->toArray();
-        };
+        }
         if (empty($arrItems['contacts'])) {
             return null;
         }
@@ -202,12 +208,12 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
     {
         return $this->_ids;
     }
-    
+
     public function getExistingSubscriberIds()
     {
         return $this->_idsUpdateExistingSubscriber;
     }
-   
+
     /**
      * Returns payload for update
      *
@@ -215,9 +221,9 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
      */
     public function getPayload()
     {
-        $arrItems = array();
+        $arrItems = [];
         $arrItems['key_id'] = $this->_getKeyId();
-        $arrItems['contacts'] = array();
+        $arrItems['contacts'] = [];
         foreach ($this as $item) {
             if (!$item->isSubscriberExists()) {
                 $arrItems['contacts'][] = $item->toArray();
@@ -232,9 +238,9 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
 
     public function getExistingPayload()
     {
-        $arrItems = array();
+        $arrItems = [];
         $arrItems['key_id'] = $this->_getConfig()->getEmarsysSubscriberKeyId();
-        $arrItems['contacts'] = array();
+        $arrItems['contacts'] = [];
         foreach ($this as $item) {
             if ($item->isSubscriberExists()) {
                 $this->_idsUpdateExistingSubscriber[] = $item->getDataObject()->getSubscriberId();
@@ -247,7 +253,7 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
 
         return $arrItems;
     }
-    
+
     public function hasMailChanges()
     {
         return !empty($this->_emailsClean);

@@ -8,7 +8,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
     }
 
     protected $_profilerKey = 'customer';
-    
+
     /**
      * @inheritdoc
      */
@@ -16,10 +16,10 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
     {
         return $this->_getConfig()->isCustomersExportEnabled();
     }
-    
+
     /**
      * Returns entity
-     * 
+     *
      * @return type Mage_Customer_Model_Customer
      */
     protected function _getEntity()
@@ -29,20 +29,20 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
 
     /**
      * Returns payload instance
-     * 
+     *
      * @return Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection
      */
     protected function _getPayloadInstance()
     {
         return Mage::getModel('emarsys_suite2/api_payload_customer_item_collection');
     }
-    
+
     /**
      * Unsets ids which are present in response as errorous records
-     * 
+     *
      * @param array $response Response
-     * @param array $ids      Ids array
-     * 
+     * @param array $ids Ids array
+     *
      * @return Emarsys_Suite2_Model_Api_Customer
      */
     protected function _filterRecords($response, &$ids, &$errors)
@@ -53,7 +53,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
                 $errorIndex = array_search($id, $ids);
                 foreach ($_errors as $errorId => $errorString) {
                     if (!isset($errors[$errorId]) || !is_array($errors[$errorId])) {
-                        $errors[$errorId] = array();
+                        $errors[$errorId] = [];
                     }
 
                     $errors[$errorId][] = $id;
@@ -65,35 +65,35 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
 
         return $this;
     }
-    
+
     /**
      * Returns customers collection
-     * 
+     *
      * @param array $ids
-     * 
+     *
      * @return Mage_Customer_Model_Resource_Customer_Collection
      */
     protected function _getCollection($ids)
     {
         // We need to join subscriber id to get the id of subscriber on a customer record
         $collection = Mage::getResourceModel('customer/customer_collection')
-                ->addAttributeToFilter('entity_id', array('in' => $ids))
-                ->addAttributeToSelect(array_keys($this->_getConfig()->getMapping()))
-                ->addAttributeToSelect(array('default_billing', 'default_shipping'))
-                ->joinTable(
-                    array('ns' => 'newsletter/subscriber'), 'customer_id = entity_id', array('subscriber_id', 'is_subscribed' => 'subscriber_status', 'subscriber_status'),
-                    null,
-                    'left'
-                );
+            ->addAttributeToFilter('entity_id', ['in' => $ids])
+            ->addAttributeToSelect(array_keys($this->_getConfig()->getMapping()))
+            ->addAttributeToSelect(['default_billing', 'default_shipping'])
+            ->joinTable(
+                ['ns' => 'newsletter/subscriber'], 'customer_id = entity_id', ['subscriber_id', 'is_subscribed' => 'subscriber_status', 'subscriber_status'],
+                null,
+                'left'
+            );
 
         return $collection;
     }
-    
+
     /**
      * Prepares payload data for exporting
-     * 
+     *
      * @param Emarsys_Suite2_Model_Resource_Queue_Collection $queue
-     * 
+     *
      * @return Emarsys_Suite2_Model_Api_Customer_Item_Collection
      */
     protected function _getPayload($queue)
@@ -109,7 +109,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
 
         return false;
     }
-    
+
     /**
      *
      *
@@ -122,10 +122,10 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
             $this->_processedEntities = array_merge($this->_processedEntities, $processedEntities);
         }
     }
-    
+
     /**
      * Exports customers from website
-     * 
+     *
      * @return Emarsys_Suite2_Model_Api_Customer
      */
     protected function _exportWebsiteData($website)
@@ -151,6 +151,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
                 Mage::logException($e);
             }
         } while ($queue);
+
         return $this;
     }
 
@@ -163,17 +164,17 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
      */
     protected function _apiExportPayload($payload, $updateExistingSubscribers = false)
     {
-        $errors = $data = array();
+        $errors = $data = [];
         if ($updateExistingSubscribers) {
             // no need to do anything when email is a key as there should be no conflict
             // since we initially removed duplicates in this case
-            $data = array();
-            $ids =  array();
+            $data = [];
+            $ids = [];
         } else {
             $data = $payload->getEmailPayload();
-            $ids  = $payload->getIds();
+            $ids = $payload->getIds();
         }
-        
+
         // Wipes out old emails from Suite if there are email changes, as updating these emails is not possible //
         if ($payload->hasMailChanges()) {
             $payload->cleanOldEMails();
@@ -209,9 +210,9 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
             $this->log($e->getMessage());
         }
 
-        return array();
+        return [];
     }
-    
+
     public function checkEmailExists($email, $websiteId)
     {
         $config = Mage::getSingleton('emarsys_suite2/config');
@@ -221,10 +222,10 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
         try {
             $response = $client->post(
                 'contact/checkids',
-                array(
+                [
                     'key_id' => $config->getEmarsysEmailKeyId(),
-                    'external_ids' => array($email)
-                )
+                    'external_ids' => [$email],
+                ]
             );
             if (isset($response['data']) && isset($response['data']['errors']) && isset($response['data']['errors'][$email])) {
                 return false;
@@ -255,10 +256,10 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
         }
 
         $this->_getConfig()->setWebsite($website);
-        $data = array(
+        $data = [
             'key_id' => $this->_getConfig()->getEmarsysEmailKeyId(),
             $this->_getConfig()->getEmarsysEmailKeyId() => $email,
-        );
+        ];
         if ($customerId) {
             $data[$this->_getConfig()->getEmarsysCustomerKeyId()] = $customerId;
         }
@@ -285,7 +286,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
      * @throws Mage_Core_Exception
      * @throws Mage_Core_Model_Store_Exception
      */
-    public function exportOne($object, $extraData = array())
+    public function exportOne($object, $extraData = [])
     {
         if (Mage::app()->getStore()->isAdmin()) {
             if ($object->getWebsiteId()) {
@@ -330,7 +331,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
 
         return true;
     }
-    
+
     /**
      * Forced export method
      */
