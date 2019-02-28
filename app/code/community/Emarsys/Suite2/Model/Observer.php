@@ -3,7 +3,7 @@
 class Emarsys_Suite2_Model_Observer
 {
     const CUSTOMER_SAVE_TRIGGER = 'CUSTOMER_SAVE_TRIGGER';
-    
+
     protected function _isEnabled()
     {
         return Mage::getSingleton('emarsys_suite2/config')->isEnabled();
@@ -11,7 +11,7 @@ class Emarsys_Suite2_Model_Observer
 
     /**
      * Returns per-event custom data
-     * 
+     *
      * @param type $customer
      * @param type $eventName
      * @return type
@@ -24,7 +24,7 @@ class Emarsys_Suite2_Model_Observer
                 // Server time needed here
                 $dt = new Zend_Date();
                 $dt = $dt->toString('YYYY-MM-dd HH:mm:ss');
-                $result = array('c_last_login' => $dt);
+                $result = ['c_last_login' => $dt];
                 break;
             case 'sales_order_save_commit_after':
                 $result = Mage::helper('emarsys_suite2')->getCustomersOrdersData($customer);
@@ -38,9 +38,9 @@ class Emarsys_Suite2_Model_Observer
 
         return $result;
     }
-    
+
     /**
-     * 
+     *
      * @param type $customer
      * @return type
      */
@@ -49,9 +49,9 @@ class Emarsys_Suite2_Model_Observer
         $email = ($customer->getEmail() ? $customer->getEmail() : $customer->getSubscriberEmail());
         return Mage::registry(self::CUSTOMER_SAVE_TRIGGER . '_' . md5($email));
     }
-    
+
     /**
-     * 
+     *
      * @param Mage_Customer_Model_Customer $customer
      */
     protected function _setCustomerSaveTriggered($customer)
@@ -61,10 +61,10 @@ class Emarsys_Suite2_Model_Observer
             Mage::register($key, 1);
         }
     }
-    
+
     /**
      * Tries to set customer's subscriber ID for API
-     * 
+     *
      * @param Mage_Catalog_Model_Customer $customer
      */
     protected function _getSubscriber($customer)
@@ -80,10 +80,10 @@ class Emarsys_Suite2_Model_Observer
 
         return $subscriber;
     }
-    
+
     /**
      * Adds subscriber data to customer object
-     * 
+     *
      * @param type $customer
      * @param type $subscriber
      */
@@ -103,7 +103,7 @@ class Emarsys_Suite2_Model_Observer
             }
         }
     }
-    
+
     /**
      * Triggered when creditmemo is updated
      */
@@ -121,7 +121,7 @@ class Emarsys_Suite2_Model_Observer
         }
 
         $order = $creditmemo->getOrder();
-        
+
         if ($order->getCustomerIsGuest()
             && !Mage::getStoreConfig('emarsys_suite2_smartinsight/settings/guest_export', $order->getStoreId())) {
             return;
@@ -131,7 +131,7 @@ class Emarsys_Suite2_Model_Observer
             Mage::getSingleton('emarsys_suite2/queue')->addEntity($creditmemo);
         }
     }
-    
+
     /**
      * Triggered after save commit, sends order and customer to Suite
      */
@@ -140,7 +140,7 @@ class Emarsys_Suite2_Model_Observer
         if (!$this->_isEnabled()) {
             return $this;
         }
-        
+
         $order = $observer->getData('order');
         // Don't export orders that were already exported
         if (Mage::getModel('emarsys_suite2/flag_order', $order)->getIsExported()) {
@@ -152,7 +152,7 @@ class Emarsys_Suite2_Model_Observer
             && !Mage::getStoreConfig('emarsys_suite2_smartinsight/settings/guest_export', $order->getStoreId())) {
             return;
         }
-        
+
         Varien_Profiler::start('EmarsysSuite2::orderSaveAfter');
         /* @var $order Mage_Sales_Model_Order */
         // if order is paid, queue it up and export customer //
@@ -160,10 +160,10 @@ class Emarsys_Suite2_Model_Observer
             Mage::getModel('emarsys_suite2/queue')->addEntity($order);
         }
 
-        if (($customerId = $order->getCustomerId()) && 
-                ($customer = Mage::getModel('customer/customer')->load($customerId)) &&
-                ($customer->getId())
-                ) {
+        if (($customerId = $order->getCustomerId()) &&
+            ($customer = Mage::getModel('customer/customer')->load($customerId)) &&
+            ($customer->getId())
+        ) {
             // add customer to observer and forward event further to customerSaveAfter
             $observer->setCustomer($customer);
             $this->customerSaveAfter($observer);
@@ -174,15 +174,17 @@ class Emarsys_Suite2_Model_Observer
 
     /**
      * Storing the updated time when there is change in the newsletter subscription status
+     *
      * @param Varien_Event_Observer $observer
      */
-     public function subscriberSaveBefore(Varien_Event_Observer $observer){
-         $subscriber = $observer->getSubscriber();
-         $website = Mage::app()->getStore($subscriber->getStoreId())->getWebsiteId();
-         if($website){
-             Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
-         }
-         if (!$this->_isEnabled()) {
+    public function subscriberSaveBefore(Varien_Event_Observer $observer)
+    {
+        $subscriber = $observer->getSubscriber();
+        $website = Mage::app()->getStore($subscriber->getStoreId())->getWebsiteId();
+        if ($website) {
+            Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
+        }
+        if (!$this->_isEnabled()) {
             return;
         }
 
@@ -190,7 +192,7 @@ class Emarsys_Suite2_Model_Observer
 
         $subscriberBeforeChange = Mage::getModel('newsletter/subscriber')->load($subscriber->getSubscriberId());
 
-        if($subscriberBeforeChange->getSubscriberId()) {
+        if ($subscriberBeforeChange->getSubscriberId()) {
             $subscriber->setOrigData('subscriber_status', $subscriberBeforeChange->getSubscriberStatus());
         }
 
@@ -202,7 +204,7 @@ class Emarsys_Suite2_Model_Observer
         }
 
     }
-    
+
     /**
      * Send or schedule subscriber info via API
      */
@@ -210,23 +212,23 @@ class Emarsys_Suite2_Model_Observer
     {
         $subscriber = $observer->getSubscriber();
         $website = Mage::app()->getStore($subscriber->getStoreId())->getWebsiteId();
-        if($website){
+        if ($website) {
             Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
         }
         if (!$this->_isEnabled()) {
             return;
         }
-        
+
         $subscriber = $observer->getSubscriber();
 
         // Skip the Subscriber Sync if there is no change in subscriber_status
-        if($subscriber->getSubscriberStatus() == $subscriber->getOrigData('subscriber_status')){
+        if ($subscriber->getSubscriberStatus() == $subscriber->getOrigData('subscriber_status')) {
             return;
         }
-        
+
         // Dispatches event which allows to set flag emarsys_no_export //
-        Mage::dispatchEvent('emarsys_before_subscriber_export', array('subscriber' => $subscriber));
-        
+        Mage::dispatchEvent('emarsys_before_subscriber_export', ['subscriber' => $subscriber]);
+
         if ($subscriber->getEmarsysNoExport() || $subscriber->getEmarsysNoObserve() /*|| $this->_getCustomerSaveTriggered($subscriber)*/) {
             return;
         }
@@ -259,7 +261,7 @@ class Emarsys_Suite2_Model_Observer
     {
         $customer = $observer->getCustomer();
         $website = $customer->getWebsiteId();
-        if($website){
+        if ($website) {
             Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
         }
         if (!$this->_isEnabled()) {
@@ -271,7 +273,7 @@ class Emarsys_Suite2_Model_Observer
         $customer = $observer->getCustomer();
         // if customer requires confirmation, then forced export must be triggered only when customer is just confirmed
         if ($customer->isConfirmationRequired()) {
-            $isCustomerExportForceNeeded = (!$customer->getConfirmation() && ($customer->getConfirmation()!= $customer->getOrigData('confirmation')));
+            $isCustomerExportForceNeeded = (!$customer->getConfirmation() && ($customer->getConfirmation() != $customer->getOrigData('confirmation')));
         } else {
             $isCustomerExportForceNeeded = $customer->isObjectNew();
             $customer->setIsNewCustomer(true);
@@ -279,18 +281,12 @@ class Emarsys_Suite2_Model_Observer
 
         if ($isCustomerExportForceNeeded) {
             $customer->setForceRealtimeExport(true);
-            if (!Mage::app()->getStore()->isAdmin()) {
-                // Force last login to be the creation date if created via frontend //
-                $dt = new Zend_Date();
-                $dt = $dt->toString('YYYY-MM-dd HH:mm:ss');
-                $customer->setData('c_last_login', $dt);
-            }
         }
 
         // Get existing subscriber_id if possible
         $storeIds = Mage::app()->getWebsite($customer->getWebsiteId())->getStoreIds();
         if ($subscriber = Mage::getResourceModel('newsletter/subscriber_collection')
-            ->addFieldToFilter('store_id', array('IN' => $storeIds))
+            ->addFieldToFilter('store_id', ['IN' => $storeIds])
             ->addFieldToFilter('subscriber_email', $customer->getEmail())
             ->getFirstItem()) {
             $customer->setSubscriberId($subscriber->getId());
@@ -311,7 +307,7 @@ class Emarsys_Suite2_Model_Observer
     {
         $customer = $observer->getCustomer();
         $website = $customer->getWebsiteId();
-        if($website){
+        if ($website) {
             Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
         }
         if (!$this->_isEnabled()) {
@@ -321,23 +317,14 @@ class Emarsys_Suite2_Model_Observer
         Varien_Profiler::start('EmarsysSuite2::customerSaveAfter');
         $customer = $observer->getCustomer();
 
-        Mage::dispatchEvent('emarsys_before_customer_export', array('customer' => $customer));
-        if ($customer->getEmarsysNoExport())
-        {
+        Mage::dispatchEvent('emarsys_before_customer_export', ['customer' => $customer]);
+        if ($customer->getEmarsysNoExport()) {
             return;
         }
 
         /* @var $customer Mage_Customer_Model_Customer */
         $extraData = $this->_getCustomData($customer, $observer->getEvent()->getName());
-        /*
-        if ($customer->getSubscriberId()) {
-            $extraData[Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection::EMARSYS_SUBSCRIBER_UPDATE_FLAG] = true;
-            $subscriber = Mage::getModel('newsletter/subscriber')->load($customer->getSubscriberId());
-            if ($subscriber->getId()) {
-                Mage::getSingleton('emarsys_suite2/queue')->removeEntity($subscriber);
-            }
-        }
-        */
+
         if (!$customer->isObjectNew() && $customer->getOrigData('email') != $customer->getData('email')) {
             $extraData[Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection::EMARSYS_MAIL_CHANGE_FROM] = $customer->getOrigData('email');
         }
@@ -406,23 +393,21 @@ class Emarsys_Suite2_Model_Observer
 
             $currentPageNumber = 1;
             $subscriberQueueCollection = Mage::getModel('emarsys_suite2/queue')->getCollection()
-                                            ->addFieldToFilter('website_id',array('eq'=>$websiteId))
-                                            ->addFieldToFilter('entity_type_id', array('eq' => '1000'))
-                                            ->setPageSize(Emarsys_Suite2_Model_Api_Abstract::BATCH_SIZE)
-                                            ->setCurPage($currentPageNumber)
-                                            ;
+                ->addFieldToFilter('website_id', ['eq' => $websiteId])
+                ->addFieldToFilter('entity_type_id', ['eq' => '1000'])
+                ->setPageSize(Emarsys_Suite2_Model_Api_Abstract::BATCH_SIZE)
+                ->setCurPage($currentPageNumber);
 
             $lastPageNumber = $subscriberQueueCollection->getLastPageNumber();
 
-            while($currentPageNumber <= $lastPageNumber){
-                $subscriberIds = array();
-                if($currentPageNumber != 1) {
+            while ($currentPageNumber <= $lastPageNumber) {
+                $subscriberIds = [];
+                if ($currentPageNumber != 1) {
                     $subscriberQueueCollection = Mage::getModel('emarsys_suite2/queue')->getCollection()
-                        ->addFieldToFilter('website_id',array('eq'=>$websiteId))
-                        ->addFieldToFilter('entity_type_id', array('eq' => '1000'))
+                        ->addFieldToFilter('website_id', ['eq' => $websiteId])
+                        ->addFieldToFilter('entity_type_id', ['eq' => '1000'])
                         ->setPageSize(Emarsys_Suite2_Model_Api_Abstract::BATCH_SIZE)
-                        ->setCurPage($currentPageNumber)
-                    ;
+                        ->setCurPage($currentPageNumber);
                 }
 
                 if (count($subscriberQueueCollection)) {
@@ -432,12 +417,12 @@ class Emarsys_Suite2_Model_Observer
                         Mage::helper("emarsys_suite2/timeBasedOptinSync")->backgroudTimeBasedOptinSync($subscriberIds, $websiteId);
                     }
                 }
-                $currentPageNumber = $currentPageNumber+1;
+                $currentPageNumber = $currentPageNumber + 1;
 
             }
 
         } catch (\Exception $e) {
-            printf("error(updateLastModifiedContacts) %s" , $e->getMessage());
+            printf("error(updateLastModifiedContacts) %s", $e->getMessage());
         }
     }
 
@@ -446,7 +431,7 @@ class Emarsys_Suite2_Model_Observer
      */
     public function syncContactsData()
     {
-        $queue = array();
+        $queue = [];
         foreach (Mage::app()->getWebsites() as $website) {
             try {
                 $config = Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
@@ -455,8 +440,8 @@ class Emarsys_Suite2_Model_Observer
                     if ($config->getContactsSyncOrder() == Emarsys_Suite2_Model_Config::SYNC_LAST_UPDATE_OPTIN_CONTACT_EXPORT) {
                         $this->updateLastModifiedContacts($website->getWebsiteId());
                         $this->exportContacts();
-                        $noWebsiteQueueCollection = Mage::getModel('emarsys_suite2/queue')->getCollection()->addFieldToFilter('website_id',0);
-                        foreach ($noWebsiteQueueCollection as $queueEntities){
+                        $noWebsiteQueueCollection = Mage::getModel('emarsys_suite2/queue')->getCollection()->addFieldToFilter('website_id', 0);
+                        foreach ($noWebsiteQueueCollection as $queueEntities) {
                             $queueEntities->delete();
                         }
                     }
@@ -466,7 +451,7 @@ class Emarsys_Suite2_Model_Observer
                     }
 
                     if (!array_key_exists($config->getSettingsApiUsername(), $queue)) {
-                        $queue[$config->getSettingsApiUsername()] = array();
+                        $queue[$config->getSettingsApiUsername()] = [];
                     }
 
                     $queue[$config->getSettingsApiUsername()][] = $website->getId();
@@ -486,7 +471,7 @@ class Emarsys_Suite2_Model_Observer
      */
     public function syncContactsSubscriptionData()
     {
-        $queue = array();
+        $queue = [];
         foreach (Mage::app()->getWebsites() as $website) {
             try {
                 $config = Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
@@ -494,7 +479,7 @@ class Emarsys_Suite2_Model_Observer
                 if ($this->_isEnabled()) {
                     if ($config->getContactsSyncOrder() == Emarsys_Suite2_Model_Config::SYNC_LAST_UPDATE_OPTIN_CONTACT_EXPORT) {
                         if (!array_key_exists($config->getSettingsApiUsername(), $queue)) {
-                            $queue[$config->getSettingsApiUsername()] = array();
+                            $queue[$config->getSettingsApiUsername()] = [];
                         }
 
                         $queue[$config->getSettingsApiUsername()][] = $website->getId();
@@ -505,7 +490,7 @@ class Emarsys_Suite2_Model_Observer
             }
         }
 
-        if(count($queue) > 0) {
+        if (count($queue) > 0) {
             foreach ($queue as $websiteIds) {
                 Mage::getSingleton('emarsys_suite2/api_subscriber')->requestSubscriptionUpdates($websiteIds, true);
             }
@@ -514,58 +499,58 @@ class Emarsys_Suite2_Model_Observer
 
     /**
      * Called when subscriber or customer deleted
-     * 
+     *
      * @param Varien_Event_Observer $observer
      */
     public function customerDeleteAfter(Varien_Event_Observer $observer)
     {
         $customer = $observer->getCustomer();
         $website = $customer->getWebsiteId();
-        if($website){
+        if ($website) {
             Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
         }
         if (!$this->_isEnabled()) {
             return $this;
         }
-        
+
         $customer = $observer->getCustomer();
         $subscriber = Mage::getModel('newsletter/subscriber')->load($customer->getId(), 'customer_id');
         if ($subscriber->getId()) {
             return $this;
 //            $this->_addSubscriberDataToCustomer($customer, $subscriber);
 //            $customer->setData('is_subscribed', 0);
-            
+
         } else {
-            Mage::getModel('emarsys_suite2/api_customer')->exportOne($customer, array('is_subscribed' => null));
+            Mage::getModel('emarsys_suite2/api_customer')->exportOne($customer, ['is_subscribed' => null]);
         }
     }
-    
+
     /**
      * Called when subscriber or customer deleted
-     * 
+     *
      * @param Varien_Event_Observer $observer
      */
     public function subscriberDeleteAfter(Varien_Event_Observer $observer)
     {
         $subscriber = $observer->getSubscriber();
         $website = Mage::app()->getStore($subscriber->getStoreId())->getWebsiteId();
-        if($website){
+        if ($website) {
             Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
         }
         if (!$this->_isEnabled()) {
             return $this;
         }
-        
+
         $subscriber = $observer->getSubscriber();
         if ($subscriber->getEmarsysNoObserve()) {
             return;
         }
 
-        $extraParams = array('is_subscribed' => null);
+        $extraParams = ['is_subscribed' => null];
         if ($customerId = $subscriber->getCustomerId()) {
             // Don't set to false if customer still exists //
-            if (Mage::getModel('customer/customer')->load($customerId, array('entity_id'))->getId()) {
-                $extraParams = array('is_subscribed' => 0);;
+            if (Mage::getModel('customer/customer')->load($customerId, ['entity_id'])->getId()) {
+                $extraParams = ['is_subscribed' => 0];;
             }
         }
 
@@ -581,19 +566,19 @@ class Emarsys_Suite2_Model_Observer
 
         // Delete should be realtime //
 //        if (Mage::getSingleton('emarsys_suite2/config')->getSyncMode() == 'realtime') {
-            Mage::getModel($apiName)->exportOne($dataObject, $extraParams);
+        Mage::getModel($apiName)->exportOne($dataObject, $extraParams);
 //        } else {
 //            Mage::getSingleton('emarsys_suite2/queue')->addEntity($dataObject, $extraParams);
 //        }
     }
-    
+
     public function pingAPI()
     {
         if (!$this->_isEnabled()) {
             return false;
         }
 
-        $pingedApis = array();
+        $pingedApis = [];
         foreach (Mage::app()->getWebsites() as $website) {
             $config = Mage::getSingleton('emarsys_suite2/config')->setWebsite($website);
             /* @var $config Emarsys_Suite2_Model_Config */
@@ -603,14 +588,14 @@ class Emarsys_Suite2_Model_Observer
                 $pingedApis[$config->getSettingsApiUsername()] = $client->ping();
             }
         }
-        
+
         foreach ($pingedApis as $apiUser => $apiError) {
             if ($apiError != 1) {
                 Mage::log(sprintf('API service ping error "%s" on API user "%s".', $apiError, $apiUser), LOG_CRIT, 'emarsys.log', true);
             }
         }
     }
-    
+
     /**
      * Enables profiler if debug mode is set
      */
@@ -620,14 +605,13 @@ class Emarsys_Suite2_Model_Observer
             Varien_Profiler::enable();
         }
     }
-    
+
     /**
      * Logs profiler if debug mode is set
      */
     public function logProfiler(Varien_Event_Observer $observer)
     {
-        if (Mage::getStoreConfig('emarsys_suite2/settings/profiler'))
-        {
+        if (Mage::getStoreConfig('emarsys_suite2/settings/profiler')) {
             foreach (Varien_Profiler::getTimers() as $code => $timer) {
                 if (strpos($code, "EmarsysSuite2::") === 0) {
                     Mage::log(
@@ -660,11 +644,11 @@ class Emarsys_Suite2_Model_Observer
     }
 
     /**
-    * Conditionnal Rewrite  Mage_Core_Model_Email_Template if
-    * Store Configuration node  'emarsys_suite2_transmail/settings/enabled' is yes
-    *
-    * @param Varien_Event_Observer $observer
-    */
+     * Conditionnal Rewrite  Mage_Core_Model_Email_Template if
+     * Store Configuration node  'emarsys_suite2_transmail/settings/enabled' is yes
+     *
+     * @param Varien_Event_Observer $observer
+     */
     public function rewriteCoreEmailTemplate(Varien_Event_Observer $observer)
     {
         if (Mage::getStoreConfig('emarsys_suite2_transmail/settings/enabled')) {
@@ -674,5 +658,5 @@ class Emarsys_Suite2_Model_Observer
             );
         }
     }
-    
-    }
+
+}

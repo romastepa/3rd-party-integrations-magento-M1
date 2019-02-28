@@ -86,6 +86,8 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
                 'left'
             );
 
+        $collection->getSelect()->group('entity_id');
+
         return $collection;
     }
 
@@ -188,7 +190,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
         $profilerCode = 'ApiExportPayload_' . $this->_profilerKey;
         $this->_profilerStart($profilerCode);
         try {
-            if ($data) {
+            if (!empty($data)) {
                 $response = $this->getClient()->put('contact/create_if_not_exists=1', $data);
                 $this->_filterRecords($response, $ids, $errors);
                 $ids = array_flip($ids); // flip back to email => id
