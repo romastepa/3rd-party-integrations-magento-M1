@@ -13,36 +13,37 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Static Array of Required Emarsys attribute Fields
+     *
      * @return array
      */
     public function getStaticFieldArray()
     {
-        $emarsysRequiredAttributes = array('Item', 'Title', 'Link', 'Image', 'Category', 'Price', 'MSRP', 'Available', 'Brand', 'Description', 'Zoom image');
-        return $emarsysRequiredAttributes;
+        return array('Item', 'Title', 'Link', 'Image', 'Category', 'Price', 'MSRP', 'Available', 'Brand', 'Description', 'Zoom_image');
     }
 
     /**
      * get Static Export Array for Emarsys
+     *
      * @return array
      */
     public function getStaticExportArray()
     {
-        $staticExportArray = array("item", "available", "title", "link", "image", "category", "price");
-        return $staticExportArray;
+        return ["item", "available", "title", "link", "image", "category", "price"];
     }
 
     /**
      * get Static Export Array for Magento
+     *
      * @return array
      */
     public function getStaticMagentoAttributeArray()
     {
-        $staticMagentoAttributeArray = array("sku", "is_saleable", "name", "url_key", "image", "category_ids", "price");
-        return $staticMagentoAttributeArray;
+        return ["sku", "is_saleable", "name", "url_key", "image", "category_ids", "price"];
     }
 
     /**
      * Moving File to FTP
+     *
      * @param $storeId
      * @param $outputFile
      * @param $ftpConnection
@@ -69,18 +70,25 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
         @ftp_chdir($ftpConnection, '/');
         try {
             @ftp_put($ftpConnection, $remoteFileName, $filePath, FTP_ASCII);
-            unlink($filePath);
+            @unlink($filePath);
         } catch (Exception $e) {
             Mage::helper('emarsys_suite2')->log($e->getMessage(), $this);
         }
     }
 
+    /**
+     * @param $magentoAttributeNames
+     * @param Mage_Catalog_Model_Product $productData
+     * @param $categoryNames
+     * @return array
+     */
     public function attributeData($magentoAttributeNames, $productData, $categoryNames)
     {
-        try {
-            //Get Product attributes
-            $attributeData = array();
-            foreach ($magentoAttributeNames as $attributeName) {
+        //Get Product attributes
+        $attributeData = [];
+        foreach ($magentoAttributeNames as $attributeName) {
+            try {
+                $attributeOption = '';
                 if ($attributeName != "category_ids") {
                     $attributeOption = trim($productData->getData($attributeName));
                     if (!is_array($attributeOption)) {
@@ -90,45 +98,42 @@ class Emarsys_Webextend_Helper_Data extends Mage_Core_Helper_Abstract
                         }
                     }
                 }
-                if (isset($attributeOption) && $attributeOption != '') {
-                    if (is_array($attributeOption)) {
-                        $attributeData[] = implode(',', $attributeOption);
-                    } else {
-                        if ($attributeName == 'category_ids') {
-                            $attributeData[] = implode('|', $categoryNames);
-                        } else if ($attributeName == 'image' || $attributeName == 'small_image' || $attributeName == 'thumbnail' || $attributeName == 'base_image') {
-                            $attributeData[] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . "catalog/product" . $attributeOption;
-                        } else if ($attributeName == 'url_key') {
-                            $attributeData[] = $productData->getProductUrl();
-                        } else if ($attributeName == 'price') {
-                            $attributeData[] = number_format($productData->getPrice(), 2, '.', '');
-                        } else if ($attributeName == 'msrp') {
-                            $attributeData[] = number_format($productData->getMsrp(), 2, '.', '');
-                        } else {
-                            $attributeData[] = $attributeOption;
-                        }
-                    }
+                if (is_array($attributeOption)) {
+                    $attributeData[] = implode(',', $attributeOption);
                 } else {
-                    if ($attributeName == 'url_key') {
-                        $attributeData[] = $productData->getProductUrl();
-                    } else if ($attributeName == 'is_saleable') {
-                        if ($productData->isSaleable())
+                    if ($attributeName == 'category_ids') {
+                        $attributeData[] = implode('|', $categoryNames);
+                    } elseif ($attributeName == 'image' || $attributeName == 'small_image' || $attributeName == 'thumbnail' || $attributeName == 'base_image') {
+                        //$attributeData[] = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . "catalog/product" . $attributeOption;
+                        $attributeData[] = (string)Mage::helper('catalog/image')->init($productData, $attributeName);
+                    } elseif ($attributeName == 'url_key') {
+                        $attributeData[] = $productData->getUrlInStore();
+                    } elseif ($attributeName == 'price') {
+                        $attributeData[] = number_format($productData->getFinalPrice(), 2, '.', '');
+                    } elseif ($attributeName == 'msrp') {
+                        $attributeData[] = number_format($productData->getMsrp(), 2, '.', '');
+                    } elseif ($attributeName == 'is_saleable') {
+                        if ($productData->isSaleable()) {
                             $attributeData[] = 'TRUE';
-                        else
+                        } else {
                             $attributeData[] = 'FALSE';
+                        }
                     } else {
-                        $attributeData[] = '';
+                        $attributeData[] = $attributeOption;
                     }
                 }
+            } catch (Exception $e) {
+                $attributeData[] = '';
+                Mage::helper('emarsys_suite2')->log($e->getMessage(), $this);
             }
-            return $attributeData;
-        } catch (Exception $e) {
-            Mage::helper('emarsys_suite2')->log($e->getMessage(), $this);
         }
+        return $attributeData;
+
     }
 
     /**
      * Check Ajax Update Enbled
+     *
      * @param $storeId
      * @return bool
      */

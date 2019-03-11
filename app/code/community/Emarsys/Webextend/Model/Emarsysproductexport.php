@@ -32,18 +32,17 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
     {
         try {
             $storeId = Mage::app()->getStore($storeId)->getId();
-            $pageSize = Mage::helper('emarsys_suite2/adminhtml')->getBatchSize();
+            $pageSize = 500;
             $exportProductStatus = Mage::getStoreConfig("catalogexport/configurable_cron/webextenproductstatus", $storeId);
             $exportProductTypes = Mage::getStoreConfig("catalogexport/configurable_cron/webextenproductoptions", $storeId);
 
+            /** @var Mage_Catalog_Model_Resource_Product_Collection $collection */
             $collection = Mage::getModel('catalog/product')->getCollection();
             $collection->setPageSize($pageSize)
                 ->setCurPage($currentPageNumber)
                 ->addStoreFilter($storeId)
+                ->addFinalPrice()
                 ->addAttributeToSelect($attributes);
-
-            Mage::getSingleton('catalog/product_status')->addVisibleFilterToCollection($collection);
-            Mage::getSingleton('catalog/product_visibility')->addVisibleInCatalogFilterToCollection($collection);
 
             //Added collection filter of type ID
             if ($exportProductTypes != "") {
@@ -51,13 +50,10 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
                 $collection->addAttributeToFilter('type_id', array('in' => $explode));
             }
             //Added status filter
-            if ($exportProductStatus == 1) {
-                $collection->addAttributeToFilter('status', array('in' => array(
-                    Mage_Catalog_Model_Product_Status::STATUS_ENABLED, Mage_Catalog_Model_Product_Status::STATUS_DISABLED
-                )));
-            } else {
+            if (!$exportProductStatus) {
                 $collection->addAttributeToFilter('status', array('eq' => Mage_Catalog_Model_Product_Status::STATUS_ENABLED));
             }
+
             return $collection;
         } catch (Exception $e) {
             Mage::helper('emarsys_suite2')->log($e->getMessage(), $this);
@@ -103,7 +99,7 @@ class Emarsys_Webextend_Model_Emarsysproductexport extends Mage_Core_Model_Abstr
         $io = new Varien_Io_File();
 
         $path = Mage::getBaseDir('var') . DS . 'export';
-        $name = "products_" . date('YmdHis', time()) . "_" . $websiteId . ".csv";
+        $name = "products_" . $websiteId . ".csv";
         $file = $path . DS . $name;
 
         $io->setAllowCreateFolders(true);

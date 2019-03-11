@@ -141,7 +141,7 @@ class Emarsys_Webextend_Block_Webextend extends Mage_Core_Block_Template
                     }
                     $categoryName = implode(" > ", $childCats);
                 }
-                return $categoryName;
+                return addcslashes($categoryName, "'");
             } else {
                 return '';
             }

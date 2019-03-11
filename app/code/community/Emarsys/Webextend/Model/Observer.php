@@ -8,147 +8,9 @@
 
 class Emarsys_Webextend_Model_Observer
 {
-    protected $_credentials = array();
-    protected $_websites = array();
-
-    /**
-     * Catalog Export Function which will call from Cron
-     */
-    public function catalogExport()
-    {
-        return $this->consolidatedCatalogExport();
-        try {
-            set_time_limit(0);
-            $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
-            $staticMagentoAttributeArray = Mage::helper('webextend')->getStaticMagentoAttributeArray();
-            $allStores = Mage::app()->getStores();
-            foreach ($allStores as $store) {
-                $counter = 0;
-                $websiteId = $store->getData("website_id");
-                $storeId = $store->getData('store_id');
-                //Getting Configuration of SmartInsight and Webextend Export
-                $hostname = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/host', $storeId);
-                $username = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/user', $storeId);
-                $password = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/password', $storeId);
-                $ftpSsl = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/ssl', $storeId);
-                $exportProductStatus = Mage::getStoreConfig("catalogexport/configurable_cron/webextenproductstatus", $storeId);
-                $exportProductTypes = Mage::getStoreConfig("catalogexport/configurable_cron/webextenproductoptions", $storeId);
-                $fullCatalogExportEnabled = Mage::getStoreConfig("catalogexport/configurable_cron/fullcatalogexportenabled", $storeId);
-
-                if ($fullCatalogExportEnabled == 1) {
-                    if ($hostname != '' && $username != '' && $password != '') {
-                        if ($ftpSsl == 1) {
-                            $ftpConnection = @ftp_ssl_connect($hostname);
-                        } else {
-                            $ftpConnection = @ftp_connect($hostname);
-                        }
-                        //Login to FTP
-                        $ftpLogin = @ftp_login($ftpConnection, $username, $password);
-                        if ($ftpLogin) {
-                            $storeCode = $store->getData("code");
-
-                            $emarsysFieldNames = array();
-                            $magentoAttributeNames = array();
-
-                            //Getting mapped emarsys attribute collection
-                            $model = Mage::getModel('webextend/emarsysproductattributesmapping');
-                            $collection = $model->getCollection();
-                            $collection->addFieldToFilter("store_id", $storeId);
-                            $collection->addFieldToFilter("emarsys_attribute_code_id", array("neq" => 0));
-                            if ($collection->getSize()) {
-                                //need to make sure required mapping fields should be there else we have to manually map.
-                                foreach ($collection as $col_record) {
-                                    $emarsysFieldName = Mage::getModel('webextend/emarsysproductattributesmapping')->getEmarsysFieldName($storeId, $col_record->getData('emarsys_attribute_code_id'));
-                                    $emarsysFieldNames[] = $emarsysFieldName;
-                                    $magentoAttributeNames[] = $col_record->getData('magento_attribute_code');
-                                }
-                                for ($ik = 0; $ik < count($staticExportArray); $ik++) {
-                                    if (!in_array($staticExportArray[$ik], $emarsysFieldNames)) {
-                                        $emarsysFieldNames[] = $staticExportArray[$ik];
-                                        $magentoAttributeNames[] = $staticMagentoAttributeArray[$ik];
-                                    }
-                                }
-                            } else {
-                                // As we does not have any Magento Emarsys Attibutes mapping so we will go with default Emarsys export attributes
-                                for ($ik = 0; $ik < count($staticExportArray); $ik++) {
-                                    if (!in_array($staticExportArray[$ik], $emarsysFieldNames)) {
-                                        $emarsysFieldNames[] = $staticExportArray[$ik];
-                                        $magentoAttributeNames[] = $staticMagentoAttributeArray[$ik];
-                                    }
-                                }
-                            }
-
-                            $currentPageNumber = 1;
-                            $pageSize = Mage::helper('emarsys_suite2/adminhtml')->getBatchSize();
-                            //Product collection with 1000 batch size
-                            $productCollection = Mage::getModel("webextend/emarsysproductattributesmapping")
-                                ->getCatalogExportProductCollection($store, $exportProductTypes, $exportProductStatus, $pageSize, $currentPageNumber);
-                            $lastPageNumber = $productCollection->getLastPageNumber();
-
-                            //create CSV file with emarsys field name header
-                            if ($counter == 0 && $productCollection->getSize()) {
-                                $heading = $emarsysFieldNames;
-                                $localFilePath = BP . "/var";
-                                $outputFile = "products_" . date('YmdHis', time()) . "_" . $storeCode . ".csv";
-                                $filePath = $localFilePath . "/" . $outputFile;
-                                $handle = fopen($filePath, 'w');
-                                fputcsv($handle, $heading);
-                            }
-                            while ($currentPageNumber <= $lastPageNumber) {
-                                if ($currentPageNumber != 1) {
-                                    $productCollection = Mage::getModel("webextend/emarsysproductattributesmapping")
-                                        ->getCatalogExportProductCollection($store, $exportProductTypes, $exportProductStatus, $pageSize, $currentPageNumber);
-                                }
-                                //iterate the product collection
-                                if (count($productCollection)) {
-                                    foreach ($productCollection as $product) {
-                                        try {
-                                            $productData = Mage::getModel("catalog/product")->setStoreId($storeId)->load($product->getId());
-                                        } catch (Exception $e) {
-                                            print_r($e->getMessage());
-                                        }
-                                        $catIds = $productData->getCategoryIds();
-                                        $categoryNames = array();
-
-                                        //Get Category Names
-                                        foreach ($catIds as $catId) {
-                                            $cateData = Mage::getModel("catalog/category")->setStoreId($storeId)->load($catId);
-                                            $categoryPath = $cateData->getPath();
-                                            $categoryPathIds = explode('/', $categoryPath);
-                                            $childCats = array();
-                                            if (count($categoryPathIds) > 2) {
-                                                $pathIndex = 0;
-                                                foreach ($categoryPathIds as $categoryPathId) {
-                                                    if ($pathIndex <= 1) {
-                                                        $pathIndex++;
-                                                        continue;
-                                                    }
-                                                    $childCateData = Mage::getModel("catalog/category")->load($categoryPathId);
-                                                    $childCats[] = $childCateData->getName();
-                                                }
-                                                $categoryNames[] = implode(" > ", $childCats);
-                                            }
-                                        }
-
-                                        //getting Product Attribute Data
-                                        $attributeData = Mage::helper('webextend')->attributeData($magentoAttributeNames, $productData, $categoryNames);
-                                        fputcsv($handle, $attributeData);
-                                    }
-                                    $currentPageNumber = $currentPageNumber + 1;
-                                }
-                            }
-                            Mage::helper('webextend')->moveToFTP($websiteId, $outputFile, $ftpConnection, $filePath);
-                        } else {
-                            Mage::helper('emarsys_suite2')->log("Unable to connect FTP for Store ID: " . $storeId, $this);
-                        }
-                    }
-                }
-                $counter++;
-            }
-        } catch (Exception $e) {
-            Mage::helper('emarsys_suite2')->log($e->getMessage(), $this);
-        }
-    }
+    protected $_credentials = [];
+    protected $_websites = [];
+    protected $_categoryNames = [];
 
     public function newSubscriberEmailAddress(Varien_Event_Observer $observer)
     {
@@ -172,16 +34,17 @@ class Emarsys_Webextend_Model_Observer
         }
     }
 
-    public function newOrderEmailAddress(Varien_Event_Observer $observer){
+    public function newOrderEmailAddress(Varien_Event_Observer $observer)
+    {
         try {
             $orderIds = $observer->getEvent()->getOrderIds();
             if (empty($orderIds) || !is_array($orderIds)) {
                 return;
             }
-            foreach($orderIds as $_orderId){
+            foreach ($orderIds as $_orderId) {
                 $order = Mage::getModel('sales/order')->load($_orderId);
                 Mage::getSingleton('core/session')->setWebExtendCustomerEmail($order->getCustomerEmail());
-                if($order->getCustomerId()) {
+                if ($order->getCustomerId()) {
                     Mage::getSingleton('core/session')->setWebExtendCustomerId($order->getCustomerId());
                 }
             }
@@ -194,11 +57,11 @@ class Emarsys_Webextend_Model_Observer
     public function hookToControllerActionPreDispatch(Varien_Event_Observer $observer)
     {
         try {
-            if($observer->getEvent()->getControllerAction()->getRequest()->getParams() && $observer->getEvent()->getControllerAction()->getRequest()->getParam('email')) {
+            if ($observer->getEvent()->getControllerAction()->getRequest()->getParams() && $observer->getEvent()->getControllerAction()->getRequest()->getParam('email')) {
                 Mage::getSingleton('core/session')->setWebExtendCustomerEmail($observer->getEvent()->getControllerAction()->getRequest()->getParam('email'));
             }
 
-            if($observer->getEvent()->getControllerAction()->getRequest()->getPost() && $observer->getEvent()->getControllerAction()->getRequest()->getPost('email')) {
+            if ($observer->getEvent()->getControllerAction()->getRequest()->getPost() && $observer->getEvent()->getControllerAction()->getRequest()->getPost('email')) {
                 Mage::getSingleton('core/session')->setWebExtendCustomerEmail($observer->getEvent()->getControllerAction()->getRequest()->getPost('email'));
             }
         } catch (Exception $e) {
@@ -217,7 +80,7 @@ class Emarsys_Webextend_Model_Observer
             }
 
             foreach ($this->getCredentials() as $websiteId => $website) {
-                $attributes = array();
+                $attributes = [];
 
                 foreach ($website as $store) {
                     $attributes = array_merge($attributes, $store['mapped_attributes_names']);
@@ -227,12 +90,14 @@ class Emarsys_Webextend_Model_Observer
 
                 /** @var Emarsys_Webextend_Model_Emarsysproductexport $productExportModel */
                 $productExportModel = Mage::getModel("webextend/emarsysproductexport");
-
                 $productExportModel->truncateTable();
 
                 $defaultStoreID = false;
 
                 foreach ($website as $storeId => $store) {
+                    /** @var Mage_Core_Model_App_Emulation $appEmulation */
+                    $appEmulation = Mage::getSingleton('core/app_emulation');
+                    $initialEnvironmentInfo = $appEmulation->startEnvironmentEmulation($storeId);
                     $currencyStoreCode = $store['store']->getDefaultCurrencyCode();
                     if (!$defaultStoreID) {
                         $defaultStoreID = $store['store']->getWebsite()->getDefaultStore()->getId();
@@ -246,7 +111,6 @@ class Emarsys_Webextend_Model_Observer
 
                     $lastPageNumber = $collection->getLastPageNumber();
                     $header = $store['emarsys_field_names'];
-
                     while ($currentPageNumber <= $lastPageNumber) {
                         if ($currentPageNumber != 1) {
                             $collection = $productExportModel->getCatalogExportProductCollection(
@@ -255,32 +119,50 @@ class Emarsys_Webextend_Model_Observer
                                 $attributes
                             );
                         }
-                        $products = array();
+                        $products = [];
+                        /** @var Mage_Catalog_Model_Product $product */
                         foreach ($collection as $product) {
+                            $product->setStoreId($storeId);
                             $catIds = $product->getCategoryIds();
                             $categoryNames = $this->getCategoryNames($catIds, $storeId);
-                            $products[$product->getId()] = array(
+                            $products[$product->getId()] = [
                                 'entity_id' => $product->getId(),
-                                'params' => serialize(array(
+                                'params' => serialize([
                                     'default_store' => ($storeId == $defaultStoreID) ? $storeId : 0,
                                     'store' => $store['store']->getCode(),
                                     'store_id' => $store['store']->getId(),
                                     'data' => Mage::helper('webextend')->attributeData($store['mapped_attributes_names'], $product, $categoryNames),
                                     'header' => $header,
                                     'currency_code' => $currencyStoreCode,
-                                ))
-                            );
+                                ]),
+                            ];
                         }
                         if (!empty($products)) {
                             $productExportModel->saveBulkProducts($products);
                         }
                         $currentPageNumber++;
                     }
+                    $appEmulation->stopEnvironmentEmulation($initialEnvironmentInfo);
                 }
 
                 if (!empty($store)) {
                     list($csvFilePath, $outputFile) = $productExportModel->saveToCsv($websiteId);
-                    Mage::helper('webextend')->moveToFTP($storeId, $outputFile, $store['ftp_connection'], $csvFilePath);
+                    $hostname = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/host', $storeId);
+                    $username = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/user', $storeId);
+                    $password = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/password', $storeId);
+                    $ftpSsl = Mage::getStoreConfig('emarsys_suite2_smartinsight/ftp/ssl', $storeId);
+                    if ($hostname != '' && $username != '' && $password != '') {
+                        if ($ftpSsl == 1) {
+                            $ftpConnection = @ftp_ssl_connect($hostname);
+                        } else {
+                            $ftpConnection = @ftp_connect($hostname);
+                        }
+                        //Login to FTP
+                        $ftpLogin = @ftp_login($ftpConnection, $username, $password);
+                        if ($ftpLogin) {
+                            Mage::helper('webextend')->moveToFTP($storeId, $outputFile, $ftpConnection, $csvFilePath);
+                        }
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -369,14 +251,14 @@ class Emarsys_Webextend_Model_Observer
     {
         $staticExportArray = Mage::helper('webextend')->getStaticExportArray();
         $staticMagentoAttributeArray = Mage::helper('webextend')->getStaticMagentoAttributeArray();
-        $emarsysFieldNames = array();
-        $magentoAttributeNames = array();
+        $emarsysFieldNames = [];
+        $magentoAttributeNames = [];
 
         //Getting mapped emarsys attribute collection
         $model = Mage::getModel('webextend/emarsysproductattributesmapping');
         $collection = $model->getCollection();
         $collection->addFieldToFilter("store_id", $storeId);
-        $collection->addFieldToFilter("emarsys_attribute_code_id", array("neq" => 0));
+        $collection->addFieldToFilter("emarsys_attribute_code_id", ["neq" => 0]);
         if ($collection->getSize()) {
             //need to make sure required mapping fields should be there else we have to manually map.
             foreach ($collection as $col_record) {
@@ -413,26 +295,28 @@ class Emarsys_Webextend_Model_Observer
      */
     public function getCategoryNames($catIds, $storeId)
     {
-        $categoryNames = array();
-        foreach ($catIds as $catId) {
-            $cateData = Mage::getModel("catalog/category")->setStoreId($storeId)->load($catId);
-            $categoryPath = $cateData->getPath();
-            $categoryPathIds = explode('/', $categoryPath);
-            $childCats = array();
-            if (count($categoryPathIds) > 2) {
-                $pathIndex = 0;
-                foreach ($categoryPathIds as $categoryPathId) {
-                    if ($pathIndex <= 1) {
-                        $pathIndex++;
-                        continue;
+        $key = $storeId . '-' . serialize($catIds);
+        if (!isset($this->_categoryNames[$key])) {
+            $this->_categoryNames[$key] = [];
+            foreach ($catIds as $catId) {
+                $cateData = Mage::getModel("catalog/category")->setStoreId($storeId)->load($catId);
+                $categoryPath = $cateData->getPath();
+                $categoryPathIds = explode('/', $categoryPath);
+                $childCats = [];
+                if (count($categoryPathIds) > 2) {
+                    $pathIndex = 0;
+                    foreach ($categoryPathIds as $categoryPathId) {
+                        if ($pathIndex <= 1) {
+                            $pathIndex++;
+                            continue;
+                        }
+                        $childCateData = Mage::getModel("catalog/category")->load($categoryPathId);
+                        $childCats[] = $childCateData->getName();
                     }
-                    $childCateData = Mage::getModel("catalog/category")->load($categoryPathId);
-                    $childCats[] = $childCateData->getName();
+                    $this->_categoryNames[$key][] = implode(" > ", $childCats);
                 }
-                $categoryNames[] = implode(" > ", $childCats);
             }
         }
-
-        return $categoryNames;
+        return $this->_categoryNames[$key];
     }
 }

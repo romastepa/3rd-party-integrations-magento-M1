@@ -189,7 +189,7 @@
         <jobs>
             <emarsys_suite2_cron_export_products>
                 <schedule>
-                    <cron_expr>0 1 * * *</cron_expr>
+                    <cron_expr>7 1 * * *</cron_expr>
                 </schedule>
                 <run>
                     <model>webextend/observer::consolidatedCatalogExport</model>
