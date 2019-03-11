@@ -22,13 +22,6 @@ class Emarsys_Suite2_Helper_TimeBasedOptinSync extends Emarsys_Suite2_Helper_Dat
                 Mage::helper('emarsys_suite2')->log($line, $this);
                 return true;
             }
-            $emarsysTime = '';
-            $emarsysDate = '';
-            $scopeId = Mage::getModel('core/store')->load($subscriber->getStoreId())->getWebsiteId();
-            $storeId = (is_object($scopeId) ?
-                $websiteId->getDefaultStore()->getId() :
-                Mage::app()->getWebsite($scopeId)->getDefaultStore()->getId()
-            );
             $fieldId = Mage::getSingleton('emarsys_suite2/config')->getEmarsysOptInFieldId();
             $keyId = Mage::getSingleton('emarsys_suite2/config')->getEmarsysEmailKeyId();
             $keyValue = $subscriber->getSubscriberEmail();
@@ -82,11 +75,6 @@ class Emarsys_Suite2_Helper_TimeBasedOptinSync extends Emarsys_Suite2_Helper_Dat
                 ->addFieldToFilter('subscriber_id',array('in'=>$subscriberIdsArray));
             $magLastModifiedStatus = array();
 
-            $storeId = (is_object($websiteId) ?
-                $websiteId->getDefaultStore()->getId() :
-                Mage::app()->getWebsite($websiteId)->getDefaultStore()->getId()
-            );
-
             $keyId = Mage::getSingleton('emarsys_suite2/config')->getEmarsysEmailKeyId();
             $keyValue = $subscribersCollection->getColumnValues('subscriber_email');
             foreach($subscribersCollection as $_subscriber){
@@ -105,7 +93,6 @@ class Emarsys_Suite2_Helper_TimeBasedOptinSync extends Emarsys_Suite2_Helper_Dat
 
             if (isset($response['data']['result'])) {
                 $emarsysSubscribers = $response['data']['result'];
-                //echo "sudheer";print_r($emarsysSubscribers);exit;
                 foreach ($emarsysSubscribers as $emarsysSubscriberKey => $emarsysSubscriberValue) {
                     $magentoLastUpdatedTime = $magLastModifiedStatus[$emarsysSubscriberKey]['change_status_at'];
                     $magentoSubscriptionStatus = $magLastModifiedStatus[$emarsysSubscriberKey]['subscriber_status'];
@@ -115,21 +102,22 @@ class Emarsys_Suite2_Helper_TimeBasedOptinSync extends Emarsys_Suite2_Helper_Dat
                     Mage::helper('emarsys_suite2')->log('Subscriber: '.$emarsysSubscriberKey.' => Emarsys Last Update: '. $emarsysSubscriberValue['time'].'(Converted: '.$emarsysLastUpdateTime.') & Magento Last Update: '.$magentoLastUpdatedTime);
                     if ($currentEmarsysSubcsriptionStatus != $magentoSubscriptionStatus) {
                         if($emarsysLastUpdateTime > $magentoLastUpdatedTime || ($emarsysLastUpdateTime == $magentoLastUpdatedTime && self::OPTIN_PRIORITY =='Emarsys')){
-
-                            if($currentEmarsysSubcsriptionStatus ==1){
+                            if ($currentEmarsysSubcsriptionStatus ==1) {
                                 $statusToBeChanged = Mage_Newsletter_Model_Subscriber::STATUS_SUBSCRIBED;
-                            }elseif($currentEmarsysSubcsriptionStatus ==2){
+                            } elseif ($currentEmarsysSubcsriptionStatus ==2){
                                 $statusToBeChanged = Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED;
-                            }else{
+                            } else {
                                 $statusToBeChanged = Mage_Newsletter_Model_Subscriber::STATUS_UNSUBSCRIBED;
                             }
 
                             $emarsysSubscriber = Mage::getModel('newsletter/subscriber')->loadByEmail($emarsysSubscriberKey);
-                            $emarsysSubscriber->setSubscriberStatus($statusToBeChanged)
-                                ->setEmarsysNoExport(true)
-                                ->save();
+                            if ($emarsysSubscriber->getId()) {
+                                $emarsysSubscriber->setSubscriberStatus($statusToBeChanged)
+                                    ->setEmarsysNoExport(true)
+                                    ->save();
 
-                            Mage::helper('emarsys_suite2')->log($emarsysSubscriber->getSubscriberId() . " => Optin Updated to " . $statusToBeChanged);
+                                Mage::helper('emarsys_suite2')->log($emarsysSubscriber->getSubscriberId() . " => Optin Updated to " . $statusToBeChanged);
+                            }
                         }
                     }
                 }
