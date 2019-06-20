@@ -9,7 +9,7 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
     const ENTITY_TYPE_SUBSCRIBER = 1000;
     
     protected $_entityTypes = array();
-    protected $_batchSize = 500;
+    protected $_batchSize = 100;
     protected $_page = 0;
     protected $_collection;
     protected $_mainEntity;

@@ -5,7 +5,7 @@ abstract class Emarsys_Suite2_Model_Api_Abstract extends Varien_Object
     protected $_processedEntities = array();
     protected $_cleanEntitiesOnEachWebsiteExport = true;
     
-    const BATCH_SIZE = 1000;
+    const BATCH_SIZE = 100;
     
     /**
      * Returns global module flag

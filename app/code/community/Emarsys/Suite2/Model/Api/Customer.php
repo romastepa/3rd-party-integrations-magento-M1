@@ -122,6 +122,10 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
         if ($payload = $this->_getPayload($queue)) {
             $processedEntities = $this->_apiExportPayload($payload);
             $this->_processedEntities = array_merge($this->_processedEntities, $processedEntities);
+            if (!empty($this->_processedEntities)) {
+                $this->cleanupQueue(array_unique($this->_processedEntities));
+                $this->_processedEntities = array();
+            }
         }
     }
 
