@@ -123,7 +123,7 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
         }
 
         $this->getResource()->loadByEntity($entity, $this);
-        
+
         if (!$this->getId()) {
             $this->setData(
                 array(
@@ -138,7 +138,13 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
             $this->setParams(serialize($extraData));
         }
 
-        return $this->save();
+        if ($this->getEntityId()) {
+            $this->save();
+        } else {
+            Mage::helper('emarsys_suite2')->log(Varien_Debug::backtrace(true, false), $this);
+        }
+
+        return $this;
     }
     
     /**

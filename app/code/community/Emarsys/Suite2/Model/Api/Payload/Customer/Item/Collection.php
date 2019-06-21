@@ -54,7 +54,9 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
     }
 
     /**
-     * @inheritdoc
+     * @param Varien_Object $item
+     * @return $this|Varien_Data_Collection
+     * @throws Exception
      */
     public function addItem(Varien_Object $item)
     {
@@ -72,19 +74,25 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
         }
 
         try {
-            $this->_ids[] = $item->getId();
-            return parent::addItem($item);
+            if (!isset($this->_items[$item->getId()]) && $item->getId()) {
+                $this->_ids[] = $item->getId();
+                parent::addItem($item);
+            } else {
+                Mage::helper('emarsys_suite2')->log(Varien_Debug::backtrace(true, false), $this);
+            }
         } catch (Exception $e) {
-            return $this;
+            throw new Exception('Item ('.get_class($item).') with the same id "'.$item->getId().'" already exist');
         }
+        return $this;
     }
 
     /**
      * Adds collection by item
      *
      * @param Varien_Data_Collection $collection Collection
-     * @param Emarsys_Suite2_Model_Resource_Queue_Collection $queue Queue if needed
+     * @param Emarsys_Suite2_Model_Resource_Queue_Collection|null $queue
      * @return Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection
+     * @throws Exception
      */
     public function addCollection($collection, $queue = null)
     {
@@ -104,7 +112,8 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
     }
 
     /**
-     * @inheritdoc
+     * @param array $arrRequiredFields
+     * @return array
      */
     public function toArray($arrRequiredFields = [])
     {
@@ -118,10 +127,14 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
         return $arrItems;
     }
 
+    /**
+     * @param $keyId
+     * @param $ids
+     * @return mixed
+     */
     protected function _checkIds($keyId, $ids)
     {
         Mage::log(Varien_Debug::backtrace(1), 1, 1, 1, 1);
-        $config = Mage::getSingleton('emarsys_suite2/config');
         $client = Mage::helper('emarsys_suite2')->getClient();
         return $client->post(
             'contact/checkids',
@@ -140,7 +153,6 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
         $config = Mage::getSingleton('emarsys_suite2/config');
         $client = Mage::helper('emarsys_suite2')->getClient();
 
-        $items = $itemsToDelete = [];
         if ($this->_emailsClean) {
             $response = $this->_checkIds($config->getEmarsysEmailKeyId(), $this->_emailsClean);
             foreach ($response['data']['ids'] as $email => $internalId) {

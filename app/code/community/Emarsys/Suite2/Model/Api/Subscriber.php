@@ -67,7 +67,7 @@ class Emarsys_Suite2_Model_Api_Subscriber extends Emarsys_Suite2_Model_Api_Custo
                 
                 $model = Mage::getModel('newsletter/subscriber')->load($id);
                 if ($id && $model->getId()) {
-                    if($isTimeBased){
+                    if ($isTimeBased){
                         $subscriberIds[] = $model->getId();
                     } else {
                         $model->setSubscriberStatus($optIn)
