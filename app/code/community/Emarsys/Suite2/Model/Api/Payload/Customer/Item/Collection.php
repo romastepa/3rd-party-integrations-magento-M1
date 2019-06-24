@@ -74,14 +74,14 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
         }
 
         try {
-            if (!isset($this->_items[$item->getId()]) && $item->getId()) {
-                $this->_ids[] = $item->getId();
+            if ($item->getId() && !isset($this->_items[$item->getId()])) {
                 parent::addItem($item);
+                $this->_ids[] = $item->getId();
             } else {
                 Mage::helper('emarsys_suite2')->log(Varien_Debug::backtrace(true, false), $this);
             }
         } catch (Exception $e) {
-            throw new Exception('Item ('.get_class($item).') with the same id "'.$item->getId().'" already exist');
+            Mage::helper('emarsys_suite2')->log($e->getMessage(), $this);
         }
         return $this;
     }
