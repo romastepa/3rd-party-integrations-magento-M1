@@ -56,6 +56,11 @@ class Emarsys_Suite2_Model_Queue extends Mage_Core_Model_Abstract
             $this->getResource()->deleteIds($this->_mainEntity->getEntityTypeId(), $ids);
         }
     }
+
+    public function deleteByIds($ids)
+    {
+        $this->getResource()->deleteByIds($ids);
+    }
     
     /**
      * Adds entity type to entity

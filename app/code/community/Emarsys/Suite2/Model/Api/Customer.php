@@ -119,13 +119,14 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
      */
     public function exportBunchData($queue)
     {
-        if ($payload = $this->_getPayload($queue)) {
-            $processedEntities = $this->_apiExportPayload($payload);
-            $this->_processedEntities = array_merge($this->_processedEntities, $processedEntities);
-            if (!empty($this->_processedEntities)) {
-                $this->cleanupQueue(array_unique($this->_processedEntities));
-                $this->_processedEntities = array();
+        try {
+            if ($payload = $this->_getPayload($queue)) {
+                $this->_apiExportPayload($payload);
             }
+            $this->deleteByIds($queue->getColumnValues('id'));
+            $this->_processedEntities = [];
+        } catch (Exception $e) {
+            $this->log('Exception: ' . $e->getMessage());
         }
     }
 
@@ -142,7 +143,7 @@ class Emarsys_Suite2_Model_Api_Customer extends Emarsys_Suite2_Model_Api_Abstrac
 
         $queue = null;
         /** @var Emarsys_Suite2_Model_Queue $queueInstance */
-        $queueInstance = Mage::getModel('emarsys_suite2/queue');
+        $queueInstance = Mage::getSingleton('emarsys_suite2/queue');
         if ($this->getCustomerIds() && is_array($this->getCustomerIds())) {
             $queueInstance->setEntityIds($this->getCustomerIds());
         }

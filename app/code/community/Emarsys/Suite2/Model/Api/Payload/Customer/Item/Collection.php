@@ -74,7 +74,7 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
         }
 
         try {
-            if ($item->getId() && !isset($this->_items[$item->getId()])) {
+            if ($item->getId() && !isset($this->_items[$item->getId()]) && $item->getEmail()) {
                 parent::addItem($item);
                 $this->_ids[] = $item->getId();
             } else {

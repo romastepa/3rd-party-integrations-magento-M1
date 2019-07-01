@@ -134,21 +134,38 @@ abstract class Emarsys_Suite2_Model_Api_Abstract extends Varien_Object
     {
         Varien_Profiler::stop('EmarsysSuite2::' . $code);
     }
-    
+
     /**
      * Removes entities from queue
-     * 
-     * @param Emarsys_Suite2_Model_Resource_Queue_Collection $queue
+     *
      * @param array $entityIds
+     * @return Emarsys_Suite2_Model_Api_Abstract
      */
     public function cleanupQueue($entityIds)
     {
-        if ($entityIds) {
+        if (!empty($entityIds)) {
             $this->log('Removing ' . count($entityIds). ' success item(s) from queue.');
-            Mage::getSingleton('emarsys_suite2/queue')->setMainEntity($this->_getEntity())->removeEntities($entityIds);
+            Mage::getModel('emarsys_suite2/queue')->setMainEntity($this->_getEntity())->removeEntities($entityIds);
             $this->log('Removed ' . count($entityIds). ' success item(s) from queue.');
         }
 
         return $this;
-    }    
+    }
+
+    /**
+     * Removes entities from queue by Ids
+     *
+     * @param array $ids
+     * @return Emarsys_Suite2_Model_Api_Abstract
+     */
+    public function deleteByIds($ids)
+    {
+        if (!empty($ids)) {
+            $this->log('Removing ' . count($ids). ' success item(s) from queue.');
+            Mage::getModel('emarsys_suite2/queue')->deleteByIds($ids);
+            $this->log('Removed ' . count($ids). ' success item(s) from queue.');
+        }
+
+        return $this;
+    }
 }

@@ -37,7 +37,7 @@ class Emarsys_Suite2_Model_Resource_Queue extends Mage_Core_Model_Resource_Db_Ab
     }
     
     /**
-     * Deletes all entities from queue by type and id
+     * Deletes all entities from queue by type and entity_id
      * 
      * @param int   $entityTypeId
      * @param array $ids
@@ -47,9 +47,22 @@ class Emarsys_Suite2_Model_Resource_Queue extends Mage_Core_Model_Resource_Db_Ab
         $this->_getWriteAdapter()->delete(
             $this->getMainTable(),
             array(
-                'entity_type_id=?' => $entityTypeId,
+                'entity_type_id = ?' => $entityTypeId,
                 'entity_id IN (?)' => $ids
                 )
+        );
+    }
+
+    /**
+     * Deletes all entities from queue by id
+     *
+     * @param array $ids
+     */
+    public function deleteByIds($ids)
+    {
+        $this->_getWriteAdapter()->delete(
+            $this->getMainTable(),
+            array('id IN (?)' => $ids)
         );
     }
     
