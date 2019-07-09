@@ -105,7 +105,11 @@ class Emarsys_Suite2_Model_Api_Payload_Customer_Item_Collection extends Varien_D
                 }
             }
 
-            $this->addItem($item);
+            try {
+                $this->addItem($item);
+            } catch (Exception $e) {
+                Mage::helper('emarsys_suite2')->log('Exception: ' . $e->getMessage(), $this);
+            }
         }
 
         return $this;
